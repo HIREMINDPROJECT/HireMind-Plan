@@ -1,0 +1,7 @@
+{
+ "m3": "XGBoost multi:softprob n_estimators=300 max_depth=4 lr=0.05 subsample=0.8 colsample=0.8, seeds 42-49; features = B1 structured evidence + exact-match link counts (no B3 semantic features in this run)",
+ "m6": "not run @ -: sentence-unit embeddings mean-pooled per document; features [cv, job, cv*job, |cv-job|, cos]; StandardScaler + LogisticRegression C=0.1 (fixed)",
+ "hyperparameters_tuned_on_validation": false,
+ "test_set_read": false,
+ "labels": "D1 train / D0 validation"
+}

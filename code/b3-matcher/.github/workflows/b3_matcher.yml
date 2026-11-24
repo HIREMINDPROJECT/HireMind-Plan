@@ -1,0 +1,53 @@
+name: b3-matcher
+concurrency:
+  group: b3-matcher
+  cancel-in-progress: true
+on:
+  workflow_dispatch:
+  push:
+    branches: [b3-matcher]
+    paths: ['b3/**', 'b1/**', '.github/workflows/b3_matcher.yml']
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pinned HireMind-DL code and data loader
+        run: |
+          git clone -q https://github.com/Hams770/HireMind-DL.git _dl && git -C _dl checkout -q 1f22f34462c400f884bb0a00f061dbea0bd687d5
+      - name: Install (CPU torch)
+        run: |
+          pip install pandas==2.2.3 scikit-learn==1.6.1 huggingface-hub==0.30.2 transformers==4.51.3 numpy scipy jsonschema sentence-transformers==3.4.1
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip freeze > pip_freeze.txt
+      - name: Rebuild B1 structured pairs (same code, offsets only)
+        shell: bash
+        run: |
+          mkdir -p out_b1 && python b1/build_structured_pairs.py _dl out_b1 2>&1 | tail -5 | cut -c1-160
+      - name: B3 matcher, DistilBERT only
+        shell: bash
+        id: match
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          mkdir -p out/distilbert
+          python b3/matcher.py distilbert _dl out_b1/structured_pairs.jsonl out/distilbert 2>&1 | tail -30 | cut -c1-200 | tee out/distilbert_log_tail.txt
+      - name: Commit outputs (scores/offsets only)
+        if: always()
+        run: |
+          for f in out/*/*.jsonl; do gzip -9 -f "$f"; done
+          mkdir -p b3_results/run_${{ github.run_id }} && cp -r out/* pip_freeze.txt b3_results/run_${{ github.run_id }}/ && cp out_b1/B1_*.json out_b1/B1_*.csv b3_results/run_${{ github.run_id }}/ 
+          gzip -9 -c out_b1/structured_pairs.jsonl > b3_results/run_${{ github.run_id }}/structured_pairs.jsonl.gz
+          du -sh b3_results
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git checkout -b b3-results-${{ github.run_id }}
+          git add -f b3_results && git commit -qm "B3 matcher outputs ${{ github.run_id }} (no raw text)"
+          git push origin b3-results-${{ github.run_id }}
+      - name: Fail if matcher failed
+        if: steps.match.outcome == 'failure'
+        run: exit 1

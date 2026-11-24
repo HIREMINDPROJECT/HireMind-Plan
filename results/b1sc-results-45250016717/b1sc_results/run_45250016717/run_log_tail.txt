@@ -1,0 +1,30 @@
+  "jd_records_only_old": 393,
+  "jd_records_only_new": 205,
+  "cv_records_old": 147311,
+  "cv_records_new": 147311
+ },
+ "jd_requirement_type_old": {
+  "UNKNOWN": 19326,
+  "REQUIRED": 15176,
+  "PREFERRED": 14664
+ },
+ "jd_requirement_type_new": {
+  "UNKNOWN": 23414,
+  "REQUIRED": 14388,
+  "PREFERRED": 11176
+ },
+ "link_status_old": {
+  "NOT_STATED_UNKNOWN": 33487,
+  "FOUND_EXPLICIT": 11675,
+  "LEVEL_MET": 1590,
+  "YEARS_STATED_NOT_COMPARED": 1872,
+  "LEVEL_BELOW_REQUIRED": 462
+ },
+ "link_status_new": {
+  "NOT_STATED_UNKNOWN": 33269,
+  "FOUND_EXPLICIT": 11642,
+  "LEVEL_MET": 1653,
+  "YEARS_STATED_NOT_COMPARED": 1872,
+  "LEVEL_BELOW_REQUIRED": 462
+ }
+}

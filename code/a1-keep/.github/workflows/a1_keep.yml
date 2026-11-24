@@ -1,0 +1,44 @@
+name: a1-keep
+on:
+  push:
+    branches: [a1-keep]
+    paths: ['a1keep/**', '.github/workflows/a1_keep.yml']
+jobs:
+  keep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download the 8 A1 checkpoint artifacts (run 45236776424)
+        uses: actions/download-artifact@v4
+        with:
+          pattern: a1-seed-*
+          path: ck
+          run-id: 45236776424
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify SHA-256 against A1_checkpoint_inventory_v3.csv and rename
+        id: verify
+        continue-on-error: true
+        shell: bash
+        run: |
+          mkdir -p rel out
+          (find ck -type f | sort; python3 a1keep/verify.py) 2>&1 | tee out/keep_log.txt
+          test "${PIPESTATUS[0]}" = 0
+      - name: Save the log (no weights) to a branch
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p a1keep_log/run_${{ github.run_id }} && cp out/keep_log.txt a1keep_log/run_${{ github.run_id }}/ || true
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git checkout -b a1keep-log-${{ github.run_id }}
+          git add -f a1keep_log && git commit -qm "A1 keep log ${{ github.run_id }}" && git push origin a1keep-log-${{ github.run_id }}
+      - name: Publish as a permanent release on this fork (no expiry)
+        if: steps.verify.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cp a1keep/A1_checkpoint_inventory_v3.csv rel/
+          gh release create a1-checkpoints-v1 rel/* --repo "$GITHUB_REPOSITORY" --title "A1 M4 + Knowledge v1 CPU checkpoints (8 seeds)" --notes "Copied from Actions run 45236776424. SHA-256 verified against A1_checkpoint_inventory_v3.csv. Model weights only; no text."

@@ -1,0 +1,5 @@
+sqlite=success
+full_with_model=success
+e2e=success
+nfr_load=success
+nfr_persist=success

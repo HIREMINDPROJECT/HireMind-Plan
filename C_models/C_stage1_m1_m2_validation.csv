@@ -1,0 +1,5 @@
+model,role,labels,train_rows,validation_rows,fit_seconds,inference_ms_per_pair,accuracy_pct,macro_f1_pct,no_fit_precision_pct,no_fit_recall_pct,no_fit_f1_pct,potential_fit_precision_pct,potential_fit_recall_pct,potential_fit_f1_pct,good_fit_precision_pct,good_fit_recall_pct,good_fit_f1_pct,confusion_true_rows_pred_cols
+M1_LogReg_C1,primary,D0 original,4993,1162,8.36,0.009,51.5491,35.3357,52.1393,90.5009,66.1616,47.5728,16.6667,24.6851,48.1481,8.9965,15.1603,"[[524,41,14],[231,49,14],[250,13,26]]"
+M2_LinearSVC_C1,primary,D0 original,4993,1162,2.86,0.006,50.8606,39.3389,53.6806,81.8653,64.8427,43.75,26.1905,32.766,38.835,13.8408,20.4082,"[[474,71,34],[188,77,29],[221,28,40]]"
+M1_LogReg_C1_balanced,sensitivity (class weights),D0 original,4993,1162,8.43,0.0072,49.7418,40.4438,56.7819,73.7478,64.1623,36.4821,38.0952,37.2712,37.8641,13.4948,19.898,"[[427,122,30],[148,112,34],[177,73,39]]"
+M2_LinearSVC_C1_balanced,sensitivity (class weights),D0 original,4993,1162,3.27,0.0058,48.7952,39.5768,54.8263,73.5751,62.8319,36.6667,33.6735,35.1064,36.5217,14.5329,20.7921,"[[426,117,36],[158,99,37],[193,54,42]]"

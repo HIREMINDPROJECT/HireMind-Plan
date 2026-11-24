@@ -1,0 +1,47 @@
+{
+  "_comment": "FR-09 fit classifier = the model frozen in the senior-project improvement plan (E1): M4, BERT-Tiny + Knowledge v1 line, trained on the original labels, seed 46 (the seed closest to the 8-seed mean). Weights: the weights/ folder of HIREMINDPROJECT/HireMind-Plan of the project fork (get them with models/get_m4_weights.sh). The platform refuses to load a weights file whose SHA-256 differs from the value below. Previous card: fit_model_M0_s42_previous.json.",
+  "name": "M4_knowledge_v1_D0_s46",
+  "weights_file": "a1_knowledge_M4_seed46_weights.pt",
+  "weights_sha256": "0953ce892ee0f075d37c1e6b4ff0bceb02a7932fddbca0ee5954f5e17fcb0c8e",
+  "base_model": "google/bert_uncased_L-2_H-128_A-2",
+  "base_revision": "30b0a37ccaaa32f332884b96992754e246e48c5f",
+  "labels": [
+    "No Fit",
+    "Potential Fit",
+    "Good Fit"
+  ],
+  "input": "knowledge_v1",
+  "max_length": 512,
+  "truncation": "longest_first",
+  "padding": "max_length",
+  "review_threshold": 0.3,
+  "review_rule": "A candidate is flagged 'possible Good Fit, HR review' when P(Good Fit) >= review_threshold. Same rule as before, validation split only: the highest threshold (step 0.025) that still flags at least half of the Good Fit pairs of the validation split. See evaluation/fr09_fit/m4_threshold_report.json.",
+  "recorded_results": {
+    "validation_accuracy": 56.97,
+    "validation_macro_f1": 48.8,
+    "validation_good_fit_recall": 38.41,
+    "validation_confusion": [
+      [
+        471,
+        40,
+        68
+      ],
+      [
+        140,
+        80,
+        74
+      ],
+      [
+        87,
+        91,
+        111
+      ]
+    ],
+    "validation_8_seed_mean": {
+      "accuracy": 56.79,
+      "macro_f1": 48.61,
+      "good_fit_recall": 36.72
+    },
+    "test": "not reported: the test set is not used in the improvement plan"
+  }
+}

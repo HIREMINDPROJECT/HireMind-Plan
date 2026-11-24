@@ -1,0 +1,60 @@
+# Non-functional test results
+
+Server: FastAPI on PostgreSQL 16, GitHub Actions runner (ubuntu-latest).
+
+| Test | Requirement | Target | Measured | Result |
+|---|---|---|---|---|
+| PT-01 | NFR-01 | Dashboard p95 ≤ 2 s, 10 users, 200 requests | p95 750 ms, 0 errors | Pass |
+| PT-02 | NFR-02 | CV analysis p95 ≤ 120 s over 50 CVs | p95 0.103 s, 50/50 parsed, 50/50 with a fit prediction | Pass |
+| PT-03 | NFR-03 | 100 simultaneous applications, none lost or duplicated | 100 stored, 100 unique | Pass |
+| RP-01 | NFR-08 | Same inputs and policy give the same score | 1 distinct score in 5 runs | Pass |
+| RT-01 | NFR-06 | Data survives a server restart | 150 applications before and after | Pass |
+
+Security (ST-01), fairness (FT-01) and retry (RT-01) checks run in `backend/tests` (pytest).
+
+```json
+{
+  "PT-02": {
+    "cvs": 50,
+    "p95_s": 0.103,
+    "max_s": 0.124,
+    "target_s": 120,
+    "parsed": 50,
+    "fit_predictions": 50,
+    "pass": true
+  },
+  "PT-01": {
+    "requests": 200,
+    "users": 10,
+    "p95_ms": 750,
+    "max_ms": 966,
+    "errors": 0,
+    "target_ms": 2000,
+    "pass": true
+  },
+  "PT-03": {
+    "submitted": 100,
+    "accepted": 100,
+    "stored": 100,
+    "unique": 100,
+    "parsed": 100,
+    "pass": true
+  },
+  "RP-01": {
+    "evaluations": 5,
+    "distinct_scores": 1,
+    "pass": true
+  },
+  "RT-01": {
+    "before_restart": {
+      "1": 50,
+      "2": 100
+    },
+    "after_restart": {
+      "1": 50,
+      "2": 100
+    },
+    "pass": true
+  }
+}
+```

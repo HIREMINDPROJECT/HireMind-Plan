@@ -1,0 +1,26 @@
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[h
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[h
+Some weights of DistilBertForSequenceClassification were not initialized from the model checkpoint at distilbert-base-uncased and are newly initialized: ['classifier.bias', 'classifier.weight', 'pre_c
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+step 50/939 loss 0.2671 elapsed_h 0.14
+step 100/939 loss 0.2511 elapsed_h 0.29
+step 150/939 loss 0.2359 elapsed_h 0.43
+step 200/939 loss 0.1796 elapsed_h 0.57
+step 250/939 loss 0.1423 elapsed_h 0.72
+step 300/939 loss 0.2376 elapsed_h 0.87
+epoch 1 {'accuracy_pct': np.float64(51.38), 'macro_f1_pct': np.float64(30.73), 'good_fit_recall_pct': np.float64(5.88)}
+step 350/939 loss 0.2346 elapsed_h 1.06
+step 400/939 loss 0.2604 elapsed_h 1.20
+step 450/939 loss 0.2873 elapsed_h 1.35
+step 500/939 loss 0.1996 elapsed_h 1.49
+step 550/939 loss 0.1373 elapsed_h 1.64
+step 600/939 loss 0.2120 elapsed_h 1.78
+epoch 2 {'accuracy_pct': np.float64(52.41), 'macro_f1_pct': np.float64(38.45), 'good_fit_recall_pct': np.float64(14.88)}
+step 650/939 loss 0.1397 elapsed_h 1.97
+step 700/939 loss 0.2946 elapsed_h 2.12
+step 750/939 loss 0.0974 elapsed_h 2.26
+step 800/939 loss 0.1681 elapsed_h 2.40
+step 850/939 loss 0.0588 elapsed_h 2.55
+step 900/939 loss 0.0594 elapsed_h 2.69
+epoch 3 {'accuracy_pct': np.float64(52.32), 'macro_f1_pct': np.float64(42.95), 'good_fit_recall_pct': np.float64(24.22)}
+{"model": "M8_DistilBERT", "variant": "minus_evidence", "components": {"evidence": false, "knowledge": true, "struct": true}, "seed": 42, "labels": "D0 original", "extractor": "v3.1", "encoder": "dist

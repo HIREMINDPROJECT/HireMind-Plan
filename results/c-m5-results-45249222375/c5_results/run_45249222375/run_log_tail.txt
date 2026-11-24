@@ -1,0 +1,29 @@
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[h
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[h
+Some weights of DistilBertForSequenceClassification were not initialized from the model checkpoint at distilbert-base-uncased and are newly initialized: ['classifier.bias', 'classifier.weight', 'pre_c
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+cpus 4 threads 4
+Some weights of DistilBertForSequenceClassification were not initialized from the model checkpoint at distilbert-base-uncased and are newly initialized: ['classifier.bias', 'classifier.weight', 'pre_c
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+max_len 384 {'seconds_per_micro_step_256': 2.255, 'micro_steps': 3747, 'projected_hours_by_len': {512: 5.39, 384: 4.05, 256: 2.7, 192: 2.02, 128: 1.35}}
+step 50/939 loss 0.2656 elapsed_h 0.19
+step 100/939 loss 0.2693 elapsed_h 0.38
+step 150/939 loss 0.2550 elapsed_h 0.57
+step 200/939 loss 0.1563 elapsed_h 0.76
+step 250/939 loss 0.1652 elapsed_h 0.96
+step 300/939 loss 0.2672 elapsed_h 1.15
+epoch 1 {'accuracy_pct': np.float64(48.54), 'macro_f1_pct': np.float64(28.02), 'good_fit_recall_pct': np.float64(3.46)}
+step 350/939 loss 0.2480 elapsed_h 1.41
+step 400/939 loss 0.2588 elapsed_h 1.60
+step 450/939 loss 0.2508 elapsed_h 1.79
+step 500/939 loss 0.1837 elapsed_h 1.99
+step 550/939 loss 0.1843 elapsed_h 2.18
+step 600/939 loss 0.2573 elapsed_h 2.37
+epoch 2 {'accuracy_pct': np.float64(50.34), 'macro_f1_pct': np.float64(36.88), 'good_fit_recall_pct': np.float64(20.76)}
+step 650/939 loss 0.1355 elapsed_h 2.63
+step 700/939 loss 0.1911 elapsed_h 2.82
+step 750/939 loss 0.0890 elapsed_h 3.01
+step 800/939 loss 0.1401 elapsed_h 3.20
+step 850/939 loss 0.0744 elapsed_h 3.39
+step 900/939 loss 0.0737 elapsed_h 3.58
+epoch 3 {'accuracy_pct': np.float64(50.6), 'macro_f1_pct': np.float64(39.32), 'good_fit_recall_pct': np.float64(12.46)}

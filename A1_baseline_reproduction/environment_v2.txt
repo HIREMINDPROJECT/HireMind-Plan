@@ -1,0 +1,47 @@
+HIREMIND A1 — ENVIRONMENT RECORD v2 (23 Nov 2026)
+Supersedes nothing; adds recovered facts to environment.txt (kept unchanged).
+
+STATUS
+- Historical runs: environment reconstructed from the original workflow file + run logs. Not a pip freeze.
+- Fresh-run environment: PENDING (filled automatically by A1_fresh_cpu_run_v2.ipynb -> pip_freeze.txt, system_info.txt).
+
+PLATFORM OF THE REFERENCE RUN (20261117T122609)
+- GitHub Actions ubuntu-latest, one runner per seed, Python 3.12, CPU only (device "cpu" in every run log)
+- HIREMIND_MAX_LEN=512 (asserted by train_knowledge.py; load_config() overrides the 256 in configs/experiment.json)
+
+PACKAGES (from .github/workflows/knowledge.yml)
+- transformers==4.51.3, pandas==2.2.3, scikit-learn==1.6.1, huggingface-hub==0.30.2
+- torch: CPU wheel from download.pytorch.org/whl/cpu, UNPINNED -> exact version NOT RECORDED
+- numpy: UNPINNED -> exact version NOT RECORDED
+
+CODE (recovered in this review)
+- Senior-2, branch claude/knowledge, reference run commit a171ea553f11f5b2b4177ce722880b3ff4aa7025
+  (other archived runs: 295afad, 6d99d32, ec28dfc, 3043f95 — Knowledge v1 path identical in all)
+- Recommended commit for a fresh run: ec28dfc85e618a737cb192cbf959714cfee89aa5
+  (same training code as a171ea5 + --save-preds; reproduced 7/8 reference seeds exactly)
+- HireMind-DL cloned at run time with --depth 1: HEAD 1f22f34462c400f884bb0a00f061dbea0bd687d5
+  (last commit 9 Nov 2026; no later commits exist, so this was the HEAD on 17 Nov)
+
+MODEL AND DATA PINS (verified)
+- Base model: google/bert_uncased_L-2_H-128_A-2 @ 30b0a37ccaaa32f332884b96992754e246e48c5f (in every run log)
+- Dataset: cnamuangtoun/resume-job-description-fit @ 08978e21714984bb417547d2c0f9b477f5298163
+- train.csv SHA-256 b86fa488a21258015de1750633a9ac410f701ff96bf533f68978dbe3adec6d40 (checked by data.py at load)
+- splits/splits.csv SHA-256 2ff3926c70152e6d5f47fbf40acebbb287e3311969618a8c7a20f45861539f9b
+  (recomputed today from the file bytes in HireMind-DL @1f22f34; the 63-character value printed in
+   MASTER_HANDOVER_EN is a typo)
+- Rows: TRAIN 4,993 · VALIDATION 1,162 (true classes 579/294/289) · TEST 1,759 (not used)
+
+TRAINING SETTINGS (from run logs)
+- 3 epochs, 939 updates, AdamW, lr 1e-4, batch 16, evaluation every 100 updates and at 939,
+  best validation macro-F1 checkpoint kept (first best wins ties)
+- Seeds 42-49
+
+CHECKPOINTS
+- Seed 42: weights.pt SHA-256 cdd6b38503d708ecb9acd8a4be387893367013675e445b1693c56f9a6ada4d8b
+  (Senior-2 final-results @1e2cc5e, 17,558,120 bytes; equals logged weights_sha256)
+- Seeds 43-49: NOT SAVED by the original workflow (no --save-weights). Mervat's 20-21 Nov GPU checkpoints
+  are knowledge:0 control or evidence-feature arms, NOT Knowledge v1 -> they do not fill this gap.
+
+DEVICE WARNING
+- CPU and GPU executions of the same seed differ materially (e.g. control s42 Good Fit recall 21.8% CPU vs
+  43.6% GPU). Any reproduction or matched comparison with this baseline must run on CPU.

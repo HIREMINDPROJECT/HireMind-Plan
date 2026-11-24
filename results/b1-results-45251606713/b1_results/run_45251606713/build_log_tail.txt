@@ -1,0 +1,15 @@
+LOG:   "LEVEL_BELOW_REQUIRED": 462,
+LOG:   "LEVEL_MET": 1653,
+LOG:   "NOT_STATED_UNKNOWN": 33269,
+LOG:   "YEARS_STATED_NOT_COMPARED": 1872
+LOG:  },
+LOG:  "note": "Rule-based extractor. Coverage numbers are NOT accuracy: extraction accuracy is measured in B2 against human annotation."
+LOG: }
+LOG: {
+LOG:  "records_checked": 196289,
+LOG:  "pointer_failures": 0,
+LOG:  "schema_failures": 0,
+LOG:  "passed": true,
+LOG:  "first_schema_errors": [],
+LOG:  "check": "re-sliced source text at [start,end) and compared SHA-256; validated each record against structured_evidence_schema_v3.json"
+LOG: }

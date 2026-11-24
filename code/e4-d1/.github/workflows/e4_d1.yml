@@ -1,0 +1,48 @@
+name: e4-d1
+# E4 on D1: M1 LR, M2 LinearSVC (TF-IDF) and M3 XGBoost (B1 v3.1 features, 8 seeds) retrained on D1 TRAIN labels, scored on the unchanged D0 validation labels.
+# Same fixed settings as stage 1/2 (no tuning). M6 not run (team decision). Test never read.
+on:
+  push:
+    branches: [e4-d1]
+    paths: ['e4d1/**', '.github/workflows/e4_d1.yml']
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pinned HireMind-DL
+        run: |
+          git clone -q https://github.com/Hams770/HireMind-DL.git _dl && git -C _dl checkout -q 1f22f34462c400f884bb0a00f061dbea0bd687d5
+          echo "001212500c11a2d471845272718bda0e458968293d551d4979d6331226c178c5  e4d1/train_labels_v1.csv" | sha256sum -c
+      - name: Install
+        run: |
+          pip install pandas==2.2.3 scikit-learn==1.6.1 huggingface-hub==0.30.2 numpy scipy xgboost
+          pip freeze > pip_freeze.txt
+      - name: M1, M2 and M3 on D1
+        id: run
+        continue-on-error: true
+        shell: bash
+        env:
+          HIREMIND_TRAIN_LABELS: "${{ github.workspace }}/e4d1/train_labels_v1.csv"
+        run: |
+          set -o pipefail
+          mkdir -p out
+          (python e4d1/c_stage1_m1_m2.py _dl out && python e4d1/c_stage2_m3_m6.py _dl out) 2>&1 | tail -30 | cut -c1-220 | tee out/run_log_tail.txt
+      - name: Commit outputs (scores/IDs only)
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p e4d1_results/run_${{ github.run_id }} && cp -r out/* pip_freeze.txt e4d1_results/run_${{ github.run_id }}/ || true
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git checkout -b e4d1-results-${{ github.run_id }}
+          git add -f e4d1_results && git commit -qm "E4 D1 classic models ${{ github.run_id }}"
+          git push origin e4d1-results-${{ github.run_id }}
+      - name: Fail if the run failed
+        if: steps.run.outcome == 'failure'
+        run: exit 1

@@ -1,0 +1,95 @@
+name: m8-distilbert
+concurrency:
+  group: m8-distilbert
+  cancel-in-progress: true
+on:
+  workflow_dispatch:
+  push:
+    branches: [m8-distilbert]
+    paths: ['m8/**', '.github/workflows/m8_distilbert.yml']
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    outputs:
+      maxlen: ${{ steps.p.outputs.maxlen }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pinned HireMind-DL code and data loader
+        run: |
+          git clone -q https://github.com/Hams770/HireMind-DL.git _dl && git -C _dl checkout -q 1f22f34462c400f884bb0a00f061dbea0bd687d5
+      - name: Install (CPU torch)
+        run: |
+          pip install pandas==2.2.3 scikit-learn==1.6.1 huggingface-hub==0.30.2 transformers==4.51.3 numpy scipy
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip freeze > pip_freeze.txt
+      - name: Smoke test (tiny subset, all 4 variants; wiring only, results discarded)
+        shell: bash
+        run: |
+          for v in full minus_evidence minus_knowledge minus_struct; do M8_SMOKE=1 python m8/m8_distilbert.py _dl smoke_$v $v 128 2>&1 | tail -3 | cut -c1-300; done
+      - name: Probe max length (same rule as M5)
+        id: p
+        shell: bash
+        run: |
+          python m8/m8_distilbert.py --probe _dl probe_out | tail -2
+          echo "maxlen=$(python -c "import json;print(json.load(open('probe_out/probe.json'))['chosen_max_len'])")" >> $GITHUB_OUTPUT
+      - uses: actions/upload-artifact@v4
+        with:
+          name: probe
+          path: probe_out/probe.json
+  train:
+    needs: probe
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [full, minus_evidence, minus_knowledge, minus_struct]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pinned HireMind-DL code and data loader
+        run: |
+          git clone -q https://github.com/Hams770/HireMind-DL.git _dl && git -C _dl checkout -q 1f22f34462c400f884bb0a00f061dbea0bd687d5
+      - name: Install (CPU torch)
+        run: |
+          pip install pandas==2.2.3 scikit-learn==1.6.1 huggingface-hub==0.30.2 transformers==4.51.3 numpy scipy
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip freeze > pip_freeze.txt
+      - name: M8 DistilBERT ${{ matrix.variant }} (D0, validation only)
+        id: run
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p out
+          python m8/m8_distilbert.py _dl out ${{ matrix.variant }} ${{ needs.probe.outputs.maxlen }} 2>&1 | tee out/full_log.txt | tail -5
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m8-distilbert-${{ matrix.variant }}-s42
+          path: out/*.pt
+          retention-days: 30
+          if-no-files-found: ignore
+      - name: Commit outputs (scores/IDs only)
+        if: always()
+        shell: bash
+        run: |
+          tail -40 out/full_log.txt | cut -c1-200 > out/run_log_tail.txt || true
+          rm -f out/full_log.txt out/*.pt
+          mkdir -p m8_results/run_${{ github.run_id }}/${{ matrix.variant }} && cp -r out/* m8_results/run_${{ github.run_id }}/${{ matrix.variant }}/ || true
+          cp pip_freeze.txt m8_results/run_${{ github.run_id }}/${{ matrix.variant }}/ || true
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git checkout -b m8-results-${{ github.run_id }}-${{ matrix.variant }}
+          git add -f m8_results && git commit -qm "M8 ${{ matrix.variant }} outputs ${{ github.run_id }} (no raw text)"
+          git push origin m8-results-${{ github.run_id }}-${{ matrix.variant }}
+      - name: Fail if the run failed
+        if: steps.run.outcome == 'failure'
+        run: exit 1

@@ -1,0 +1,314 @@
+diff --git a/backend/app/fit_model.py b/backend/app/fit_model.py
+index b1bbab4..327bcf7 100644
+--- a/backend/app/fit_model.py
++++ b/backend/app/fit_model.py
+@@ -1,4 +1,5 @@
+-"""FR-09 fit classifier: BERT-Tiny M0 (seed 42) from the CS4085 Deep Learning project.
++"""FR-09 fit classifier: the model named in models/fit_model.json (now M4 = BERT-Tiny + Knowledge v1, seed 46, the
++model frozen in the senior-project improvement plan; before: M0 seed 42 from the CS4085 Deep Learning project).
+ 
+ The model reads the CV text and the job text together and gives probabilities for No Fit, Potential Fit and
+ Good Fit. It is evidence for HR only: it never changes the score and never rejects anyone. Because the model
+@@ -18,6 +19,7 @@ from dataclasses import dataclass
+ from pathlib import Path
+ 
+ from . import config
++from .knowledge import features, knowledge_line
+ 
+ log = logging.getLogger("hiremind.fit")
+ 
+@@ -50,6 +52,14 @@ def job_text(job) -> str:
+     return "\n".join(p for p in parts if p)
+ 
+ 
++def model_pair(cv_text: str, job_text_: str) -> tuple[str, str]:
++    """The exact text pair the model was trained on. For input 'knowledge_v1' the job text starts with the Knowledge v1
++    line (skills the job asks for, which the CV shows, years on each side), computed from the full texts as in training."""
++    if CARD.get("input") == "knowledge_v1":
++        return cv_text, knowledge_line(features(cv_text, job_text_)) + "\n" + job_text_
++    return cv_text, job_text_
++
++
+ def sha256_file(path: Path) -> str:
+     h = hashlib.sha256()
+     with open(path, "rb") as f:
+@@ -59,7 +69,7 @@ def sha256_file(path: Path) -> str:
+ 
+ 
+ class _TorchBackend:
+-    """Loads the pinned tokenizer and architecture, then the verified M0 weights, on CPU."""
++    """Loads the pinned tokenizer and architecture, then the verified weights, on CPU."""
+ 
+     def __init__(self, weights: Path):
+         import torch
+@@ -75,6 +85,7 @@ class _TorchBackend:
+         self.model.eval()
+ 
+     def __call__(self, pairs: list[tuple[str, str]]) -> list[list[float]]:
++        pairs = [model_pair(cv, job) for cv, job in pairs]
+         enc = self.tok([p[0] for p in pairs], [p[1] for p in pairs], truncation=CARD["truncation"],
+                        max_length=CARD["max_length"], padding=CARD["padding"], return_tensors="pt")
+         with self.torch.inference_mode():
+diff --git a/backend/app/knowledge.py b/backend/app/knowledge.py
+new file mode 100644
+index 0000000..31d8e0b
+--- /dev/null
++++ b/backend/app/knowledge.py
+@@ -0,0 +1,49 @@
++"""Copy of evaluation/knowledge/knowledge.py for the platform (same vocabulary: app/skills.py). Knowledge features for a CV-job pair, from the platform's own skill vocabulary (backend/app/skills.py).
++
++These are facts the classifier would otherwise have to learn from 4,993 examples: which skills the job asks for,
++which of them the CV shows, and the years of experience on each side. Used by the knowledge-signal check
++(step 2) and, if the signal is real, as a short text line in front of the job description (step 3).
++"""
++import re
++
++from .skills import CONTEXT_ONLY, SKILLS
++
++_BOUND_L, _BOUND_R = r"(?<![\w+#.])", r"(?![\w+#])"
++# plain dataset text has no sections, so the ambiguous spellings (go, swift, sales, ml, …) are not used
++_PATTERNS = {canon: re.compile(_BOUND_L + "(?:" + "|".join(
++    r"\s+".join(map(re.escape, s.split())) for s in sorted(set(sp), key=len, reverse=True) if s not in CONTEXT_ONLY)
++    + ")" + _BOUND_R, re.IGNORECASE)
++    for canon, sp in SKILLS.items() if any(s not in CONTEXT_ONLY for s in sp)}
++_YEARS = re.compile(r"(\d{1,2})\s*\+?\s*(?:-\s*\d{1,2}\s*)?(?:years?|yrs?)\b", re.IGNORECASE)
++
++
++def skills_in(text: str) -> set[str]:
++    return {c for c, p in _PATTERNS.items() if p.search(text)}
++
++
++def years_in(text: str) -> int | None:
++    ys = [int(m.group(1)) for m in _YEARS.finditer(text) if 0 < int(m.group(1)) <= 40]
++    return max(ys) if ys else None
++
++
++def features(cv: str, job: str) -> dict:
++    js, cs = skills_in(job), skills_in(cv)
++    found = js & cs
++    jy, cy = years_in(job), years_in(cv)
++    return {"job_skills": sorted(js), "found": sorted(found), "missing": sorted(js - cs),
++            "n_job_skills": len(js), "n_found": len(found), "match_ratio": len(found) / len(js) if js else None,
++            "job_years": jy, "cv_years": cy,
++            "meets_years": None if jy is None or cy is None else int(cy >= jy)}
++
++
++def knowledge_line(f: dict) -> str:
++    """The text added in front of the job description (step 3)."""
++    if not f["n_job_skills"]:
++        return "Skills check: no listed skills recognised."
++    parts = [f"Skills check: {f['n_found']} of {f['n_job_skills']} required skills found",
++             "found: " + ", ".join(f["found"]) if f["found"] else "found: none"]
++    if f["missing"]:
++        parts.append("missing: " + ", ".join(f["missing"]))
++    if f["meets_years"] is not None:
++        parts.append(f"experience {f['cv_years']} years, job asks {f['job_years']}")
++    return "; ".join(parts) + "."
+diff --git a/backend/models/fit_model.json b/backend/models/fit_model.json
+index e817cfe..f26b56f 100644
+--- a/backend/models/fit_model.json
++++ b/backend/models/fit_model.json
+@@ -1,21 +1,47 @@
+ {
+-  "_comment": "FR-09 fit classifier. Weights from the CS4085 Deep Learning project (github.com/Hams770/HireMind-DL), frozen deployment seed 42. The platform refuses to load a weights file whose SHA-256 differs from the value below.",
+-  "name": "M0_s42_lr0.0001",
+-  "weights_file": "M0_s42_lr0.0001.pt",
+-  "weights_sha256": "6ac7862edea03cba6c9f7854c45f7c7fc470b0c54518ebb8791f571f08997d71",
++  "_comment": "FR-09 fit classifier = the model frozen in the senior-project improvement plan (E1): M4, BERT-Tiny + Knowledge v1 line, trained on the original labels, seed 46 (the seed closest to the 8-seed mean). Weights: the weights/ folder of HIREMINDPROJECT/HireMind-Plan of the project fork (get them with models/get_m4_weights.sh). The platform refuses to load a weights file whose SHA-256 differs from the value below. Previous card: fit_model_M0_s42_previous.json.",
++  "name": "M4_knowledge_v1_D0_s46",
++  "weights_file": "a1_knowledge_M4_seed46_weights.pt",
++  "weights_sha256": "0953ce892ee0f075d37c1e6b4ff0bceb02a7932fddbca0ee5954f5e17fcb0c8e",
+   "base_model": "google/bert_uncased_L-2_H-128_A-2",
+   "base_revision": "30b0a37ccaaa32f332884b96992754e246e48c5f",
+-  "labels": ["No Fit", "Potential Fit", "Good Fit"],
+-  "max_length": 256,
++  "labels": [
++    "No Fit",
++    "Potential Fit",
++    "Good Fit"
++  ],
++  "input": "knowledge_v1",
++  "max_length": 512,
+   "truncation": "longest_first",
+   "padding": "max_length",
+-  "review_threshold": 0.225,
+-  "review_rule": "A candidate is flagged 'possible Good Fit, HR review' when P(Good Fit) >= review_threshold. Chosen on the validation split only (test results are not used for choosing): the highest threshold (step 0.025) that still flags at least half of the Good Fit pairs of the validation split. On validation 0.225 flags 34.5% of pairs and catches 56.1% of Good Fit, against 23.9% for the predicted label alone. See test-results/fit_model_report.md.",
++  "review_threshold": 0.3,
++  "review_rule": "A candidate is flagged 'possible Good Fit, HR review' when P(Good Fit) >= review_threshold. Same rule as before, validation split only: the highest threshold (step 0.025) that still flags at least half of the Good Fit pairs of the validation split. See evaluation/fr09_fit/m4_threshold_report.json.",
+   "recorded_results": {
+-    "validation_macro_f1": 46.536276922018175,
+-    "validation_confusion": [[475, 65, 39], [152, 102, 40], [122, 98, 69]],
+-    "test_macro_f1": 37.892486687401004,
+-    "test_accuracy": 46.333143831722566,
+-    "test_good_fit_recall": 15.065502183406112
++    "validation_accuracy": 56.97,
++    "validation_macro_f1": 48.8,
++    "validation_good_fit_recall": 38.41,
++    "validation_confusion": [
++      [
++        471,
++        40,
++        68
++      ],
++      [
++        140,
++        80,
++        74
++      ],
++      [
++        87,
++        91,
++        111
++      ]
++    ],
++    "validation_8_seed_mean": {
++      "accuracy": 56.79,
++      "macro_f1": 48.61,
++      "good_fit_recall": 36.72
++    },
++    "test": "not reported: the test set is not used in the improvement plan"
+   }
+ }
+diff --git a/backend/models/fit_model_M0_s42_previous.json b/backend/models/fit_model_M0_s42_previous.json
+new file mode 100644
+index 0000000..8bd91fd
+--- /dev/null
++++ b/backend/models/fit_model_M0_s42_previous.json
+@@ -0,0 +1,41 @@
++{
++  "_comment": "FR-09 fit classifier. Weights from the CS4085 Deep Learning project (github.com/Hams770/HireMind-DL), frozen deployment seed 42. The platform refuses to load a weights file whose SHA-256 differs from the value below.",
++  "name": "M0_s42_lr0.0001",
++  "weights_file": "M0_s42_lr0.0001.pt",
++  "weights_sha256": "6ac7862edea03cba6c9f7854c45f7c7fc470b0c54518ebb8791f571f08997d71",
++  "base_model": "google/bert_uncased_L-2_H-128_A-2",
++  "base_revision": "30b0a37ccaaa32f332884b96992754e246e48c5f",
++  "labels": [
++    "No Fit",
++    "Potential Fit",
++    "Good Fit"
++  ],
++  "max_length": 256,
++  "truncation": "longest_first",
++  "padding": "max_length",
++  "review_threshold": 0.225,
++  "review_rule": "A candidate is flagged 'possible Good Fit, HR review' when P(Good Fit) >= review_threshold. Chosen on the validation split only (test results are not used for choosing): the highest threshold (step 0.025) that still flags at least half of the Good Fit pairs of the validation split. On validation 0.225 flags 34.5% of pairs and catches 56.1% of Good Fit, against 23.9% for the predicted label alone. See test-results/fit_model_report.md.",
++  "recorded_results": {
++    "validation_macro_f1": 46.536276922018175,
++    "validation_confusion": [
++      [
++        475,
++        65,
++        39
++      ],
++      [
++        152,
++        102,
++        40
++      ],
++      [
++        122,
++        98,
++        69
++      ]
++    ],
++    "test_macro_f1": 37.892486687401004,
++    "test_accuracy": 46.333143831722566,
++    "test_good_fit_recall": 15.065502183406112
++  }
++}
+diff --git a/backend/models/get_m4_weights.sh b/backend/models/get_m4_weights.sh
+new file mode 100644
+index 0000000..f799984
+--- /dev/null
++++ b/backend/models/get_m4_weights.sh
+@@ -0,0 +1,7 @@
++#!/usr/bin/env bash
++# Downloads the frozen M4 weights (17.6 MB) next to this script and checks their SHA-256.
++set -euo pipefail
++cd "$(dirname "$0")"
++curl -fsSL -o a1_knowledge_M4_seed46_weights.pt https://github.com/HIREMINDPROJECT/HireMind-Plan/raw/main/weights/a1_knowledge_M4_seed46_weights.pt \
++  || curl -fsSL -o a1_knowledge_M4_seed46_weights.pt https://github.com/HIREMINDPROJECT/HireMind-Plan/raw/main/weights/a1_knowledge_M4_seed46_weights.pt
++echo "0953ce892ee0f075d37c1e6b4ff0bceb02a7932fddbca0ee5954f5e17fcb0c8e  a1_knowledge_M4_seed46_weights.pt" | sha256sum -c
+diff --git a/backend/tests/test_fit.py b/backend/tests/test_fit.py
+index 03e65dd..42054d0 100644
+--- a/backend/tests/test_fit.py
++++ b/backend/tests/test_fit.py
+@@ -35,7 +35,7 @@ def test_fr09_prediction_is_stored_when_the_candidate_applies(client):
+     fit = client.get(f"/api/applications/{app_id}/fit", headers=hr).json()
+     p = fit["prediction"]
+     assert p["label"] == "Good Fit" and abs(sum(p["probabilities"].values()) - 1) < 1e-9
+-    assert p["model_version"].startswith("M0_s42_lr0.0001 (6ac7862e")
++    assert p["model_version"].startswith("M4_knowledge_v1_D0_s46 (0953ce89")
+     row = client.get(f"/api/jobs/{jid}/candidates", headers=hr).json()[0]
+     assert row["fit"]["label"] == "Good Fit"
+ 
+@@ -117,3 +117,12 @@ def test_fr09_hr_correction_re_runs_the_model_on_the_corrected_text(client):
+                      json={"text": "Corrected CV text with SQL", "reason": "Fixed the extraction by hand"})
+     assert r.status_code == 200, r.text
+     assert model.seen[-1][0] == "Corrected CV text with SQL"
++
++
++def test_model_input_adds_the_knowledge_line():
++    """M4 was trained with the Knowledge v1 line in front of the job text; the platform must send the same input."""
++    cv, job = fit_model.model_pair("Python and SQL, 3 years of experience.", "Data analyst. Required skills: python, aws. 5 years.")
++    assert cv == "Python and SQL, 3 years of experience."
++    first, rest = job.split("\n", 1)
++    assert first.startswith("Skills check:") and "python" in first and "aws" in first
++    assert rest == "Data analyst. Required skills: python, aws. 5 years."
+diff --git a/evaluation/fr09_fit/choose_threshold_m4.py b/evaluation/fr09_fit/choose_threshold_m4.py
+new file mode 100644
+index 0000000..bf7ed62
+--- /dev/null
++++ b/evaluation/fr09_fit/choose_threshold_m4.py
+@@ -0,0 +1,51 @@
++"""FR-09 integration check for M4 (validation split only; the test split is not read).
++
++    python evaluation/fr09_fit/choose_threshold_m4.py --dl ../HireMind-DL
++
++Runs every validation pair through backend/app/fit_model.py (the platform's own code, which adds the Knowledge v1 line),
++checks that the result equals the frozen model's recorded validation numbers, then applies the platform's review rule:
++the highest threshold (step 0.025) that still flags at least half of the Good Fit pairs. Writes the threshold into
++backend/models/fit_model.json and the evidence into evaluation/fr09_fit/m4_threshold_report.json.
++"""
++import argparse, json, sys
++from pathlib import Path
++import numpy as np
++ROOT = Path(__file__).resolve().parents[2]
++sys.path.insert(0, str(ROOT / "backend"))
++
++ap = argparse.ArgumentParser(); ap.add_argument("--dl", required=True); a = ap.parse_args()
++sys.path.insert(0, str(Path(a.dl).resolve() / "src"))
++from hiremind_dl import load_config
++from hiremind_dl.data import download_raw, load_manifest, read_raw, split_frame
++card_path = ROOT / "backend/models/fit_model.json"
++card = json.loads(card_path.read_text())
++if not isinstance(card["review_threshold"], (int, float)):
++    card["review_threshold"] = 0.5; card_path.write_text(json.dumps(card, indent=2) + "\n")  # placeholder so the module loads
++from app import config, fit_model
++config.FIT_ENABLED = True
++st = fit_model.status(); assert st["available"], st["reason"]
++cfg = load_config(Path(a.dl) / "configs" / "experiment.json")
++raw = {"train": read_raw(download_raw(cfg, "train"))}  # the test file is never downloaded
++d = split_frame(raw, load_manifest(cfg), "validation", cfg["dataset"]["rows"]["validation"])
++pairs = [(cv if isinstance(cv, str) else "", job if isinstance(job, str) else "") for cv, job in zip(d.resume_text, d.job_description_text)]
++probs = np.array([p for i in range(0, len(pairs), 32) for p in fit_model.predict_batch(pairs[i:i + 32])])
++y = d.label_id.to_numpy(); pred = probs.argmax(1)
++cm = np.zeros((3, 3), int)
++for t, p in zip(y, pred): cm[t, p] += 1
++acc = 100 * (pred == y).mean(); gfr = 100 * cm[2, 2] / cm[2].sum()
++rec = card["recorded_results"]
++print(f"platform code on validation: accuracy {acc:.2f} (frozen {rec['validation_accuracy']}), Good Fit recall {gfr:.2f} (frozen {rec['validation_good_fit_recall']})")
++print("confusion", cm.tolist(), "frozen", rec["validation_confusion"])
++assert abs(acc - rec["validation_accuracy"]) <= 0.2, "platform predictions differ from the frozen model"
++good = y == 2
++grid = [round(t, 3) for t in np.arange(0.025, 1.0, 0.025)]
++ok = [t for t in grid if (probs[good, 2] >= t).mean() >= 0.5]
++thr = max(ok)
++flag = probs[:, 2] >= thr
++card["review_threshold"] = thr
++card_path.write_text(json.dumps(card, indent=2) + "\n")
++rep = dict(split="validation", rows=int(len(y)), accuracy=round(acc, 2), good_fit_recall=round(gfr, 2), confusion=cm.tolist(),
++           review_threshold=thr, flagged_share=round(100 * flag.mean(), 1), good_fit_caught=round(100 * flag[good].mean(), 1),
++           good_fit_among_flagged=round(100 * good[flag].mean(), 1))
++(ROOT / "evaluation/fr09_fit/m4_threshold_report.json").write_text(json.dumps(rep, indent=2) + "\n")
++print(json.dumps(rep))

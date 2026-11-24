@@ -1,0 +1,85 @@
+{
+ "lex": {
+  "pairs_exceeding_512": 4972,
+  "cv_relevant_evidence_retained_pct": {
+   "baseline": 33.38,
+   "evidence_aware": 82.88
+  },
+  "jd_requirements_retained_pct": {
+   "baseline": 38.65,
+   "evidence_aware": 90.43
+  },
+  "by_label": {
+   "Good Fit": {
+    "n": 1226,
+    "cv_rel_baseline": 31.21,
+    "cv_rel_evidence": 81.68,
+    "jd_req_baseline": 37.72,
+    "jd_req_evidence": 89.28
+   },
+   "No Fit": {
+    "n": 2522,
+    "cv_rel_baseline": 34.46,
+    "cv_rel_evidence": 83.85,
+    "jd_req_baseline": 39.14,
+    "jd_req_evidence": 90.66
+   },
+   "Potential Fit": {
+    "n": 1224,
+    "cv_rel_baseline": 34.2,
+    "cv_rel_evidence": 82.77,
+    "jd_req_baseline": 38.68,
+    "jd_req_evidence": 91.31
+   }
+  },
+  "pairs_evidence_aware_keeps_fewer_cv_relevant": 23,
+  "pairs_evidence_aware_keeps_more_cv_relevant": 3648,
+  "pairs_evidence_aware_keeps_fewer_jd_req": 10,
+  "median_tokens": {
+   "baseline": 512.0,
+   "evidence_aware": 511.0
+  }
+ },
+ "lex_k": {
+  "pairs_exceeding_512": 4979,
+  "cv_relevant_evidence_retained_pct": {
+   "baseline": 33.18,
+   "evidence_aware": 79.53
+  },
+  "jd_requirements_retained_pct": {
+   "baseline": 34.26,
+   "evidence_aware": 90.44
+  },
+  "by_label": {
+   "Good Fit": {
+    "n": 1228,
+    "cv_rel_baseline": 31.03,
+    "cv_rel_evidence": 77.64,
+    "jd_req_baseline": 32.02,
+    "jd_req_evidence": 89.28
+   },
+   "No Fit": {
+    "n": 2525,
+    "cv_rel_baseline": 34.26,
+    "cv_rel_evidence": 80.75,
+    "jd_req_baseline": 35.15,
+    "jd_req_evidence": 90.67
+   },
+   "Potential Fit": {
+    "n": 1226,
+    "cv_rel_baseline": 33.98,
+    "cv_rel_evidence": 79.83,
+    "jd_req_baseline": 34.99,
+    "jd_req_evidence": 91.31
+   }
+  },
+  "pairs_evidence_aware_keeps_fewer_cv_relevant": 23,
+  "pairs_evidence_aware_keeps_more_cv_relevant": 3658,
+  "pairs_evidence_aware_keeps_fewer_jd_req": 6,
+  "median_tokens": {
+   "baseline": 512.0,
+   "evidence_aware": 511.0
+  }
+ },
+ "note": "Relevant = CV records linked to a job requirement, explicit negatives, degrees and stated years, plus job requirement records. 'Retained' = every character of the span is in the kept text. Labels split the report only; they never build inputs. Retaining more relevant evidence does not by itself show the classifier improves: that is tested in E2."
+}

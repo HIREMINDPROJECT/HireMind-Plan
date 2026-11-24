@@ -1,0 +1,12 @@
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[h
+No sentence-transformers model found with name distilbert-base-uncased. Creating a new one with mean pooling.
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[h
+train features+matching done 1161 s
+validation features+matching done 1194 s
+              feature_set   seed  accuracy_pct  macro_f1_pct  potential_fit_recall_pct  good_fit_precision_pct  good_fit_recall_pct
+8            lexical_only  mean8       54.8300       43.4870                   36.2670                 45.6091              14.2301
+9            lexical_only    sd8        0.7826        1.3313                    0.9610                  5.3086               2.0298
+18  lexical_plus_semantic  mean8       54.5288       42.8431                   30.4847                 55.1539              15.8737
+19  lexical_plus_semantic    sd8        0.6553        1.1423                    0.7482                  2.3188               1.9612
+28          semantic_only  mean8       49.6558       38.7751                   25.3827                 51.0536              15.3979
+29          semantic_only    sd8        0.6015        0.7904                    1.1345                  2.0876               0.8476

@@ -1,0 +1,22 @@
+id,test,result,detail
+T01,page loads with no console errors,PASS,
+T02,advice-only banner visible,PASS,
+T03,built-in demo loads; rows = requirements,PASS,7 vs 7
+T04,abstain flag shown as low confidence,PASS,
+T05,unknown is shown as 'not negative',PASS,
+T06,save without decision is blocked,PASS,['Choose a decision first. The tool never decides for you.']
+T07,override without reason is blocked,PASS,['Please give a reason when your decision differs from the suggestion.']
+T08,audit record content,PASS,"{""overridden"": true, ""hr_decision"": ""No Fit"", ""suggestion"": ""Potential Fit""}"
+T09,audit record has no CV/job text,PASS,
+T10,no request leaves localhost,PASS,[]
+T12,HTML in CV/job/requirement text is not executed,PASS,
+T13,HTML shown literally,PASS,
+T14,"invalid JSON: message shown, app stays hidden",PASS,['Could not read the file']
+T15,"wrong schema: message shown, app stays hidden",PASS,['Not a valid case file']
+T16,highlight correct with emoji (code-point offsets),PASS,['Python']
+T17,bad/overlapping spans do not crash,PASS,[]
+T18,HR checks from case 1 do not leak into case 2's audit record,PASS,{}
+T19,case without prediction shows notice and saves,PASS,
+T20,"300 requirements, 14k-char CV renders in < 3 s",PASS,0.33s
+T21,demo over file:// shows the help message,PASS,"[""Open this page next to demo_case_SYNTHETIC.json (or use 'Load a case JSON').""]"
+T22,controls have accessible names,PASS,

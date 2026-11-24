@@ -1,0 +1,9 @@
+LOG: Traceback (most recent call last):
+LOG:   File "/home/runner/work/HireMind-DL/HireMind-DL/b1/build_structured_pairs.py", line 24, in <module>
+LOG:     from hiremind_dl.data import download_raw, load_manifest, read_raw, split_frame  # noqa: E402
+LOG:     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+LOG:   File "/home/runner/work/HireMind-DL/HireMind-DL/_dl/src/hiremind_dl/data.py", line 8, in <module>
+LOG:     from .splits import text_id
+LOG:   File "/home/runner/work/HireMind-DL/HireMind-DL/_dl/src/hiremind_dl/splits.py", line 23, in <module>
+LOG:     from sklearn.feature_extraction.text import TfidfVectorizer
+LOG: ModuleNotFoundError: No module named 'sklearn'

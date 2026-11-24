@@ -1,0 +1,75 @@
+name: e0-preds
+# E0 (D0 labels): same pinned M4 reproduction as A1, re-run ONLY to save per-pair validation predictions for error analysis. IDs/probabilities only: the job_title text column is dropped before upload. No weights saved. Validation only; test never read.
+on:
+  workflow_dispatch:
+  push:
+    branches: [e0-preds]
+    paths: ['.github/workflows/e0_preds.yml']
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [42, 43, 44, 45, 46, 47, 48, 49]
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Checkout pinned code
+        run: |
+          git clone -q https://github.com/Hams770/Senior-2.git && git -C Senior-2 checkout -q ec28dfc85e618a737cb192cbf959714cfee89aa5
+          git clone -q https://github.com/Hams770/HireMind-DL.git && git -C HireMind-DL checkout -q 1f22f34462c400f884bb0a00f061dbea0bd687d5
+      - name: Install (same pins as the original workflow)
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install transformers==4.51.3 pandas==2.2.3 scikit-learn==1.6.1 huggingface-hub==0.30.2 numpy
+          mkdir -p out/env && pip freeze > out/env/pip_freeze.txt && lscpu > out/env/lscpu.txt && python -V > out/env/python.txt
+      - name: Train seed ${{ matrix.seed }} (CPU)
+        env:
+          HIREMIND_MAX_LEN: "512"
+          HIREMIND_RESULTS: "${{ github.workspace }}/out/results"
+        run: |
+          cd Senior-2
+          python evaluation/knowledge/train_knowledge.py --dl ../HireMind-DL --seed ${{ matrix.seed }} --variant knowledge --knowledge 1 --device cpu --save-preds
+      - name: Drop text column from predictions
+        run: |
+          python - <<'PY'
+          import glob, pandas as pd
+          fs = glob.glob('out/results/val_predictions_*.csv')
+          assert fs, 'no predictions written'
+          for f in fs:
+              d = pd.read_csv(f)
+              d = d.drop(columns=[c for c in d.columns if c == 'job_title'])
+              d.to_csv(f, index=False); print(f, d.shape, list(d.columns))
+          PY
+        shell: bash
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e0-seed-${{ matrix.seed }}
+          path: out/
+          retention-days: 30
+  collect:
+    needs: train
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: e0-seed-*
+          path: collected
+      - name: Commit results (no .pt weights; they stay as downloadable artifacts)
+        run: |
+          mkdir -p e0_results/run_${{ github.run_id }}
+          for d in collected/e0-seed-*; do
+            s=$(basename "$d"); mkdir -p "e0_results/run_${{ github.run_id }}/$s"
+            (cd "$d" && find . -type f ! -name '*.pt' -print0 | xargs -0 -I{} cp --parents {} "$GITHUB_WORKSPACE/e0_results/run_${{ github.run_id }}/$s/")
+            (cd "$d" && find . -name '*.pt' -exec sha256sum {} \;) > "e0_results/run_${{ github.run_id }}/$s/checkpoint_sha256.txt"
+          done
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git checkout -b e0-results-${{ github.run_id }}
+          git add -f e0_results && git commit -qm "E0 predictions run ${{ github.run_id }} results (no weights)"
+          git push origin e0-results-${{ github.run_id }}

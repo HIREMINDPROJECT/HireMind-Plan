@@ -1,0 +1,94 @@
+name: e3-platform-m4
+# E3/ISS-11: platform tests with the frozen M4 model served (patch e3m4/m4_platform.patch on Senior-2 ec28dfc, read-only clone).
+on:
+  push:
+    branches: [e3-platform-m4]
+    paths: [".github/workflows/e3_platform.yml", "e3m4/**"]
+  workflow_dispatch:
+jobs:
+  platform:
+    runs-on: ubuntu-latest
+    permissions: { contents: write }
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_USER: hiremind, POSTGRES_PASSWORD: hiremind, POSTGRES_DB: hiremind }
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out the platform (read-only)
+        run: |
+          git clone -q https://github.com/Hams770/Senior-2.git plat
+          cd plat && git checkout -q ec28dfc && git log -1 --format='%H %s' | tee ../platform_commit.txt
+          git -c user.name=ci -c user.email=ci@x am -q ../e3m4/m4_platform.patch && git log -1 --format='patched: %H %s' | tee -a ../platform_commit.txt
+          bash backend/models/get_m4_weights.sh
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r plat/backend/requirements.txt playwright==1.49.1 && python -m playwright install --with-deps chromium
+      - name: Unit and API tests (SQLite, no model)
+        id: t_sqlite
+        continue-on-error: true
+        working-directory: plat/backend
+        run: set -o pipefail; pytest -q -rs --junitxml=../../junit_sqlite.xml 2>&1 | tee ../../pytest_sqlite.log
+      - name: Install the fit classifier (CPU PyTorch)
+        run: pip install torch --index-url https://download.pytorch.org/whl/cpu && pip install -r plat/backend/requirements-model.txt
+      - name: Integration check on validation + review threshold (platform code, frozen M4)
+        run: |
+          pip install pandas==2.2.3 scikit-learn==1.6.1 huggingface-hub==0.30.2
+          git clone -q https://github.com/Hams770/HireMind-DL.git _dl && git -C _dl checkout -q 1f22f34462c400f884bb0a00f061dbea0bd687d5
+          cd plat && HIREMIND_MAX_LEN=512 python evaluation/fr09_fit/choose_threshold_m4.py --dl ../_dl 2>&1 | tail -6 | tee ../m4_integration.log
+      - name: Full suite with the real model (FR-09)
+        id: t_full
+        continue-on-error: true
+        working-directory: plat/backend
+        run: set -o pipefail; pytest -q -rs --junitxml=../../junit_full.xml 2>&1 | tee ../../pytest_full.log
+      - name: Start a server on an empty SQLite database (browser test)
+        working-directory: plat/backend
+        run: |
+          python -m app.cli create-admin admin@hiremind.test 'AdminPass123'
+          nohup uvicorn app.main:app --port 8000 > ../../server.log 2>&1 &
+          sleep 8 && curl -sf http://127.0.0.1:8000/api/health
+      - name: Browser test of every screen (e2e)
+        id: t_e2e
+        continue-on-error: true
+        working-directory: plat
+        run: set -o pipefail; python e2e/run_e2e.py 2>&1 | tee ../e2e.log
+      - name: Start a server on PostgreSQL (non-functional tests)
+        working-directory: plat/backend
+        env: { DATABASE_URL: "postgresql+psycopg2://hiremind:hiremind@localhost:5432/hiremind", UPLOAD_DIR: /tmp/uploads-pg }
+        run: |
+          python -m app.cli create-admin admin@hiremind.test 'AdminPass123'
+          nohup uvicorn app.main:app --port 8001 --workers 2 > ../../server-pg.log 2>&1 &
+          sleep 8 && curl -sf http://127.0.0.1:8001/api/health
+      - name: Non-functional tests (load)
+        id: t_load
+        continue-on-error: true
+        working-directory: plat
+        run: set -o pipefail; python nfr/run_nfr.py load 2>&1 | tee ../nfr_load.log
+      - name: Restart the server, then check nothing was lost
+        working-directory: plat/backend
+        env: { DATABASE_URL: "postgresql+psycopg2://hiremind:hiremind@localhost:5432/hiremind", UPLOAD_DIR: /tmp/uploads-pg }
+        run: |
+          pkill -f "uvicorn app.main:app --port 8001" || true; sleep 2
+          nohup uvicorn app.main:app --port 8001 --workers 2 >> ../../server-pg.log 2>&1 &
+          sleep 8 && curl -sf http://127.0.0.1:8001/api/health
+      - name: Non-functional tests (persist)
+        id: t_persist
+        continue-on-error: true
+        working-directory: plat
+        run: set -o pipefail; python nfr/run_nfr.py persist 2>&1 | tee ../nfr_persist.log
+      - name: Keep the reports on a results branch (synthetic seeded records only, no CV data)
+        if: always()
+        run: |
+          mkdir -p out
+          printf 'sqlite=%s\nfull_with_model=%s\ne2e=%s\nnfr_load=%s\nnfr_persist=%s\n' "${{ steps.t_sqlite.outcome }}" "${{ steps.t_full.outcome }}" "${{ steps.t_e2e.outcome }}" "${{ steps.t_load.outcome }}" "${{ steps.t_persist.outcome }}" > out/outcomes.txt
+          cp -f platform_commit.txt junit_*.xml pytest_*.log e2e.log nfr_*.log m4_integration.log plat/backend/models/fit_model.json plat/evaluation/fr09_fit/m4_threshold_report.json out/ 2>/dev/null || true
+          (cd plat && git diff ec28dfc -- . ':!backend/models/*.pt' > ../out/m4_platform_final.patch) || true
+          cp -f plat/test-results/nfr_report.md out/ 2>/dev/null || true
+          cp -rf plat/test-results/screenshots out/ 2>/dev/null || true
+          tail -40 server.log > out/server_tail.log 2>/dev/null || true; tail -40 server-pg.log > out/server_pg_tail.log 2>/dev/null || true
+          cd out && git init -q && git checkout -q -b "e3-platform-m4-results-${GITHUB_RUN_ID}"
+          git -c user.name=ci -c user.email=ci@users.noreply.github.com add -A -f
+          git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "E3 platform test results, run ${GITHUB_RUN_ID}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" "e3-platform-m4-results-${GITHUB_RUN_ID}"

@@ -1,0 +1,11 @@
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[h
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[h
+/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:451: OptimizeWarning: Unknown solver options: iprint
+  opt_res = optimize.minimize(
+/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:451: OptimizeWarning: Unknown solver options: iprint
+  opt_res = optimize.minimize(
+M3 features (4993, 72) in 108.4 s
+M3 mean {'accuracy_pct': 57.53, 'macro_f1_pct': 48.43, 'potential_fit_recall_pct': 34.74, 'good_fit_precision_pct': 56.96, 'good_fit_recall_pct': 25.3}
+M6 embeddings (4993, 1537) in 401.4 s
+M6_MiniLM_LogReg_C0.1 {'accuracy_pct': np.float64(54.73), 'macro_f1_pct': np.float64(48.21), 'potential_fit_recall_pct': np.float64(55.1), 'good_fit_precision_pct': np.float64(48.09), 'good_fit_recall
+M6_MiniLM_LogReg_C0.1_balanced {'accuracy_pct': np.float64(53.53), 'macro_f1_pct': np.float64(47.99), 'potential_fit_recall_pct': np.float64(55.78), 'good_fit_precision_pct': np.float64(45.75), 'good_

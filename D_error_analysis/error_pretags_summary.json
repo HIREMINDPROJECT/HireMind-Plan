@@ -1,0 +1,70 @@
+{
+ "n_pairs": 1162,
+ "n_seeds": 8,
+ "consistent_mistakes": 476,
+ "consistent_mistake_rate_pct": 41.0,
+ "q25_job_nn_cos": 0.2094,
+ "job_groups": 55,
+ "job_groups_with_n10plus_and_rate_over_overall_plus15pts": [
+  {
+   "job_group": "5ebaaf46b0dec5f2",
+   "n_pairs": 56,
+   "mistakes": 32,
+   "mistake_rate_pct": 57.1
+  },
+  {
+   "job_group": "37e1510df017d10e",
+   "n_pairs": 42,
+   "mistakes": 24,
+   "mistake_rate_pct": 57.1
+  },
+  {
+   "job_group": "6c1a68b3091b29e3",
+   "n_pairs": 34,
+   "mistakes": 24,
+   "mistake_rate_pct": 70.6
+  },
+  {
+   "job_group": "645aa0dbf7e9be15",
+   "n_pairs": 29,
+   "mistakes": 23,
+   "mistake_rate_pct": 79.3
+  },
+  {
+   "job_group": "0ffa07fa38252240",
+   "n_pairs": 34,
+   "mistakes": 20,
+   "mistake_rate_pct": 58.8
+  },
+  {
+   "job_group": "3620b010fe8ff8c8",
+   "n_pairs": 23,
+   "mistakes": 15,
+   "mistake_rate_pct": 65.2
+  },
+  {
+   "job_group": "9b35d921089a5243",
+   "n_pairs": 23,
+   "mistakes": 15,
+   "mistake_rate_pct": 65.2
+  },
+  {
+   "job_group": "c3e5cf06adeea6dc",
+   "n_pairs": 18,
+   "mistakes": 13,
+   "mistake_rate_pct": 72.2
+  },
+  {
+   "job_group": "973640a35ddfd2eb",
+   "n_pairs": 14,
+   "mistakes": 10,
+   "mistake_rate_pct": 71.4
+  }
+ ],
+ "pending_human": [
+  "extraction_error (B2 gold)",
+  "semantic_mismatch (B3 on validation)",
+  "label_disagreement (A4/D1 review)"
+ ],
+ "note": "Pre-tags are objective flags, a mistake can carry several. Concentrated misses in a job group are a warning signal, not proof of wrong labels."
+}

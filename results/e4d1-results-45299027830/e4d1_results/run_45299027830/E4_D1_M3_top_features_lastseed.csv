@@ -1,0 +1,16 @@
+,importance
+cert_required_unknown,0.0382
+cert_preferred_n,0.0354
+job_years_max,0.0345
+skill_unknown_found,0.0335
+edu_preferred_n,0.0317
+skill_unknown_rate,0.029
+skill_preferred_n,0.0249
+edu_required_n,0.0248
+n_requirements,0.0234
+years_unknown_rate,0.0229
+cert_preferred_rate,0.022
+n_jd_records,0.0219
+cert_unknown_rate,0.0218
+cert_required_rate,0.0217
+skill_required_rate,0.0209

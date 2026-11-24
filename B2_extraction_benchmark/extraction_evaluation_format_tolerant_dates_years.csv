@@ -1,0 +1,3 @@
+field_type,match_rule,gold_claims,predicted_claims,true_positives,precision,recall,f1
+YEARS_EXPERIENCE,"same case, source and number of years",35,33,29,0.879,0.829,0.853
+EMPLOYMENT_DATES,"same case and date range after removing spaces/punctuation (present=current)",90,91,49,0.538,0.544,0.541

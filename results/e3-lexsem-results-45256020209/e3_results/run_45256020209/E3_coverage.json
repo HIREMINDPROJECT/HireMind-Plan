@@ -1,0 +1,22 @@
+{
+ "train": {
+  "requirements": 48898,
+  "exact_found": 13295,
+  "exact_negative": 0,
+  "semantic_only_candidates": 30200,
+  "missing_indicator": 5403,
+  "exact_found_pct": 27.19,
+  "exact_plus_semantic_candidates_pct": 88.95
+ },
+ "validation": {
+  "requirements": 11795,
+  "exact_found": 3067,
+  "exact_negative": 0,
+  "semantic_only_candidates": 7349,
+  "missing_indicator": 1379,
+  "exact_found_pct": 26.0,
+  "exact_plus_semantic_candidates_pct": 88.31
+ },
+ "threshold": 0.8121,
+ "note": "semantic-only candidates are NOT verified matches: B3 showed raw DistilBERT similarity barely separates real from false matches; human reading is needed before calling any of them evidence."
+}

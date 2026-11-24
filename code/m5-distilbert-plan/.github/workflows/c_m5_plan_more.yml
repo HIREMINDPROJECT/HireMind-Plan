@@ -1,0 +1,72 @@
+name: c-m5-plan-more
+# Extra seeds 46-49 for the two most important arms (DistilBERT + Knowledge v1 + B4 evidence, D0 and D1), so they have 8 seeds like BERT-Tiny. Same protocol (CPU, lr 3e-5, max length 384).
+on:
+  workflow_dispatch:
+  push:
+    branches: [c-m5-plan-more]
+    paths: ['phase_c2_m5/**', '.github/workflows/c_m5.yml']
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [46, 47, 48, 49]
+        arm: [kev_D0, kev_D1]
+    timeout-minutes: 350
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pinned HireMind-DL code and data loader
+        run: |
+          git clone -q https://github.com/Hams770/HireMind-DL.git _dl && git -C _dl checkout -q 1f22f34462c400f884bb0a00f061dbea0bd687d5
+      - name: Pinned Knowledge v1 code (Senior-2 ec28dfc, same as M4)
+        run: |
+          git clone -q https://github.com/Hams770/Senior-2.git _s2 && git -C _s2 checkout -q ec28dfc85e618a737cb192cbf959714cfee89aa5
+      - name: Install (CPU torch)
+        run: |
+          pip install pandas==2.2.3 scikit-learn==1.6.1 huggingface-hub==0.30.2 transformers==4.51.3 numpy scipy
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip freeze > pip_freeze.txt
+      - name: Machine
+        run: free -g; nproc
+      - name: M5 DistilBERT (D0, validation only)
+        id: run
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p out
+          case "${{ matrix.arm }}" in
+            k_D1) export M5_KNOWLEDGE=1 M5_LABELS=$GITHUB_WORKSPACE/phase_c2_m5/e2mods/train_labels_v1.csv ;;
+            kev_D0) export M5_EVIDENCE=1 ;;
+            kev_D1) export M5_EVIDENCE=1 M5_LABELS=$GITHUB_WORKSPACE/phase_c2_m5/e2mods/train_labels_v1.csv ;;
+          esac
+          echo "001212500c11a2d471845272718bda0e458968293d551d4979d6331226c178c5  phase_c2_m5/e2mods/train_labels_v1.csv" | sha256sum -c
+          M5_KNOWLEDGE_DIR=$GITHUB_WORKSPACE/_s2/evaluation/knowledge M5_E2_DIR=$GITHUB_WORKSPACE/phase_c2_m5/e2mods M5_SEED=${{ matrix.seed }} python phase_c2_m5/c_stage2_m5_distilbert.py _dl out 384 2>&1 | tee out/full_log.txt | tail -5
+      - name: Keep the weights as an Actions artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m5-distilbert-${{ matrix.arm }}-s${{ matrix.seed }}
+          path: out/*.pt
+          retention-days: 30
+          if-no-files-found: ignore
+      - name: Commit outputs (scores/IDs only)
+        if: always()
+        shell: bash
+        run: |
+          tail -40 out/full_log.txt | cut -c1-200 > out/run_log_tail.txt || true
+          rm -f out/full_log.txt out/*.pt
+          mkdir -p c5p_results/run_${{ github.run_id }}_${{ matrix.arm }}_s${{ matrix.seed }} && cp -r out/* pip_freeze.txt c5p_results/run_${{ github.run_id }}_${{ matrix.arm }}_s${{ matrix.seed }}/ || true
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git checkout -b c-m5-plan-results-${{ github.run_id }}-${{ matrix.arm }}-s${{ matrix.seed }}
+          git add -f c5p_results && git commit -qm "C M5 plan arm ${{ matrix.arm }} seed ${{ matrix.seed }} outputs ${{ github.run_id }} (no raw text)"
+          git push origin c-m5-plan-results-${{ github.run_id }}-${{ matrix.arm }}-s${{ matrix.seed }}
+      - name: Fail if the run failed
+        if: steps.run.outcome == 'failure'
+        run: exit 1

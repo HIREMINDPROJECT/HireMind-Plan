@@ -1,0 +1,4 @@
+true_class,n_pairs,consistent_mistakes,mistake_rate_pct,relevant_evidence_dropped_pct_of_mistakes,requirement_ambiguity_pct_of_mistakes,unseen_job_shift_pct_of_mistakes,candidate_classifier_error_pct_of_mistakes,relevant_evidence_dropped_pct_of_ALL_pairs_in_class,requirement_ambiguity_pct_of_ALL_pairs_in_class,unseen_job_shift_pct_of_ALL_pairs_in_class
+No Fit,579,92,15.9,85.9,48.9,19.6,5.4,77.7,46.8,26.9
+Potential Fit,294,206,70.1,74.8,41.3,22.3,15.5,73.1,38.4,25.9
+Good Fit,289,178,61.6,87.1,82.0,16.3,8.4,88.9,75.4,20.8

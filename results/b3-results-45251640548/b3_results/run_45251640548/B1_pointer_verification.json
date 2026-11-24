@@ -1,0 +1,8 @@
+{
+ "records_checked": 196289,
+ "pointer_failures": 0,
+ "schema_failures": 0,
+ "passed": true,
+ "first_schema_errors": [],
+ "check": "re-sliced source text at [start,end) and compared SHA-256; validated each record against structured_evidence_schema_v3.json"
+}

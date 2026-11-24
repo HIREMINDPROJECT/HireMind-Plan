@@ -1,0 +1,43 @@
+{
+ "model": "M8_DistilBERT",
+ "variant": "minus_evidence",
+ "components": {
+  "evidence": false,
+  "knowledge": true,
+  "struct": true
+ },
+ "seed": 42,
+ "labels": "D0 original",
+ "extractor": "v3.1",
+ "encoder": "distilbert-base-uncased",
+ "encoder_revision": "12040accade4e8a0f71eabdb258fecc2e7e948be",
+ "max_len": 512,
+ "best_epoch": 3,
+ "accuracy": 52.32358003442341,
+ "macro_f1": 42.9507006718401,
+ "good_fit_recall": 24.22145328719723,
+ "good_fit_precision": 45.16129032258064,
+ "potential_fit_recall": 26.190476190476193,
+ "confusion": [
+  [
+   461,
+   68,
+   50
+  ],
+  [
+   182,
+   77,
+   35
+  ],
+  [
+   112,
+   107,
+   70
+  ]
+ ],
+ "n_struct_features": 72,
+ "stopped_early_by_wall_guard": false,
+ "checkpoint_rule": "best validation macro-F1 over 3 epoch-end evaluations (optimistic; same as M5)",
+ "test_set_read": false,
+ "torch": "2.15.0+cpu"
+}

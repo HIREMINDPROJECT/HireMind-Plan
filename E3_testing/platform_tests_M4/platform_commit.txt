@@ -1,0 +1,2 @@
+ec28dfc85e618a737cb192cbf959714cfee89aa5 Error analysis (Tool 4): per-pair validation predictions of the knowledge model and a breakdown of missed Good Fit
+patched: df2c0f579815f7deb2ba6553855c0141af302fd6 FR-09: serve the frozen M4 model (BERT-Tiny + Knowledge v1, seed 46)

@@ -1,0 +1,2 @@
+model,role,labels,max_len,train_rows,validation_rows,best_epoch,fit_seconds,inference_ms_per_pair,accuracy_pct,macro_f1_pct,no_fit_precision_pct,no_fit_recall_pct,no_fit_f1_pct,potential_fit_precision_pct,potential_fit_recall_pct,potential_fit_f1_pct,good_fit_precision_pct,good_fit_recall_pct,good_fit_f1_pct,confusion_true_rows_pred_cols
+M5_DistilBERT_s42,primary (single seed),D0 original,384,4993,1162,3,13683.0,222.35,50.6024,39.3212,61.4667,79.62,69.3755,30.2326,30.9524,30.5882,32.4324,12.4567,18.0,"[[461,79,39],[167,91,36],[122,131,36]]"

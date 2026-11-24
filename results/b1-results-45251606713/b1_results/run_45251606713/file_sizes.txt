@@ -1,0 +1,9 @@
+total 106892
+drwxr-xr-x  2 runner runner      4096 Nov 23 19:44 .
+drwxr-xr-x 18 runner runner      4096 Nov 23 19:42 ..
+-rw-r--r--  1 runner runner      1104 Nov 23 19:44 B1_coverage_report.json
+-rw-r--r--  1 runner runner      1475 Nov 23 19:44 B1_link_status_summary.csv
+-rw-r--r--  1 runner runner       259 Nov 23 19:44 B1_pointer_verification.json
+-rw-r--r--  1 runner runner       592 Nov 23 19:44 build_log_tail.txt
+-rw-r--r--  1 runner runner         0 Nov 23 19:44 file_sizes.txt
+-rw-r--r--  1 runner runner 109430075 Nov 23 19:44 structured_pairs.jsonl

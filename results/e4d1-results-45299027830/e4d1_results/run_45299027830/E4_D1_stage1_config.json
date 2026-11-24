@@ -1,0 +1,5 @@
+{
+ "features": "TF-IDF word 1-2gram, CV max 100k + job max 40k, min_df=3, sublinear_tf; fit on TRAIN only",
+ "hyperparameters_tuned_on_validation": false,
+ "test_set_read": false
+}

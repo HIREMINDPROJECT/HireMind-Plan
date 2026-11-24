@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/hiremind/structured-evidence-v3.schema.json",
+  "title": "HireMind Structured Evidence Record v3 (extends Mervat v2)",
+  "description": "Traceable CV and job-description evidence. Every record points to exact character offsets in the ORIGINAL text and carries span_sha256 so the pointer can be re-verified without storing the text. verbatim_text is present only in the private form. A requirement with no CV evidence is NOT a negative: see requirement_links in the pair record.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "case_id",
+    "confidence",
+    "evidence_category",
+    "evidence_status",
+    "normalized_value",
+    "record_id",
+    "requirement_type",
+    "source_end_char",
+    "source_start_char",
+    "source_type",
+    "span_sha256"
+  ],
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Anonymous CV-job pair identifier."
+    },
+    "source_type": {
+      "type": "string",
+      "enum": [
+        "CV",
+        "JOB_DESCRIPTION"
+      ]
+    },
+    "evidence_category": {
+      "type": "string",
+      "enum": [
+        "SKILL",
+        "TOOL_TECHNOLOGY",
+        "EXPERIENCE",
+        "EMPLOYMENT",
+        "EDUCATION",
+        "PROJECT",
+        "CERTIFICATION",
+        "QUALIFICATION",
+        "LANGUAGE",
+        "RESPONSIBILITY",
+        "OTHER"
+      ]
+    },
+    "verbatim_text": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Exact source text of the span. Present only in the PRIVATE form; the shareable file stores span_sha256 instead."
+    },
+    "normalized_value": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Concise normalized concept, e.g. Python, project management, 3 years."
+    },
+    "evidence_status": {
+      "type": "string",
+      "enum": [
+        "EXPLICIT",
+        "IMPLIED",
+        "NOT_STATED",
+        "UNCLEAR",
+        "UNKNOWN",
+        "EXPLICIT_NEGATIVE"
+      ],
+      "description": "EXPLICIT: stated in the source. EXPLICIT_NEGATIVE: the source itself says the person lacks it (\"no Java experience\"). UNCLEAR: mentioned but not usable (interest only, negated requirement). NOT_STATED/UNKNOWN: used in links only, never as a span record. Absence of a mention is never recorded as EXPLICIT_NEGATIVE."
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ]
+    },
+    "source_location": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Page, section, or paragraph reference; null if unavailable."
+    },
+    "requirement_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Identifier of the job requirement linked to this evidence, if applicable."
+    },
+    "requirement_text": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Relevant job requirement text, when linking CV evidence to a requirement."
+    },
+    "years_experience": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Only populate when explicitly supported by the source."
+    },
+    "proficiency_level": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "BEGINNER",
+        "INTERMEDIATE",
+        "ADVANCED",
+        "EXPERT",
+        null
+      ]
+    },
+    "date_or_timeframe": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Exact date or timeframe if stated."
+    },
+    "context": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Short context needed to interpret the evidence; no unsupported inference."
+    },
+    "review_required": {
+      "type": "boolean",
+      "description": "True when ambiguous, low confidence, or requiring human review."
+    },
+    "requirement_type": {
+      "type": "string",
+      "enum": [
+        "REQUIRED",
+        "PREFERRED",
+        "NOT_APPLICABLE",
+        "UNKNOWN"
+      ],
+      "description": "Whether a job requirement is mandatory or preferred. Use NOT_APPLICABLE for CV-only evidence."
+    },
+    "source_start_char": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Zero-based inclusive character offset in the original source."
+    },
+    "source_end_char": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Zero-based exclusive character offset in the original source."
+    },
+    "employment_start_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Employment start date, only when supported by source evidence."
+    },
+    "employment_end_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Employment end date, or an explicitly stated current status."
+    },
+    "degree_name": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Degree or education qualification explicitly stated in the source."
+    },
+    "project_name": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Project name, if explicitly stated."
+    },
+    "record_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique within the file: <case_id>:R### (job) or :C### (CV)."
+    },
+    "span_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 (UTF-8) of text[source_start_char:source_end_char]."
+    },
+    "section": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "CV section the span sits in (summary, skills, experience, education, ...), null for job text."
+    },
+    "matched_alias": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Lower-cased vocabulary spelling that matched."
+    },
+    "context_start_char": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Start of the containing sentence (offset into the same source)."
+    },
+    "context_end_char": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "linked_requirement_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "On CV records: job requirement record_ids this evidence supports."
+    }
+  }
+}

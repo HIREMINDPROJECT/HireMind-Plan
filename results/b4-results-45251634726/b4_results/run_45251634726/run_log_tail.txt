@@ -1,0 +1,30 @@
+    "cv_rel_baseline": 31.03,
+    "cv_rel_evidence": 77.64,
+    "jd_req_baseline": 32.02,
+    "jd_req_evidence": 89.28
+   },
+   "No Fit": {
+    "n": 2525,
+    "cv_rel_baseline": 34.26,
+    "cv_rel_evidence": 80.75,
+    "jd_req_baseline": 35.15,
+    "jd_req_evidence": 90.67
+   },
+   "Potential Fit": {
+    "n": 1226,
+    "cv_rel_baseline": 33.98,
+    "cv_rel_evidence": 79.83,
+    "jd_req_baseline": 34.99,
+    "jd_req_evidence": 91.31
+   }
+  },
+  "pairs_evidence_aware_keeps_fewer_cv_relevant": 23,
+  "pairs_evidence_aware_keeps_more_cv_relevant": 3658,
+  "pairs_evidence_aware_keeps_fewer_jd_req": 6,
+  "median_tokens": {
+   "baseline": 512.0,
+   "evidence_aware": 511.0
+  }
+ },
+ "note": "Relevant = CV records linked to a job requirement, explicit negatives, degrees and stated years, plus job requirement records. 'Retained' = every character of the span is in the kept text. L
+}

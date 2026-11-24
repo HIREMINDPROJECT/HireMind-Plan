@@ -1,0 +1,13 @@
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip inst
+TRAIN label overlay applied: 255
+/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:451: OptimizeWarning: Unknown solver options: iprint
+  opt_res = optimize.minimize(
+/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:451: OptimizeWarning: Unknown solver options: iprint
+  opt_res = optimize.minimize(
+M1_LogReg_C1 {'accuracy_pct': np.float64(51.64), 'macro_f1_pct': np.float64(34.83), 'potential_fit_recall_pct': np.float64(19.39), 'good_fit_precision_pct': np.float64(54.55), 'good_fit_recall_pct': np.float64(6.23)} [[5
+M2_LinearSVC_C1 {'accuracy_pct': np.float64(50.17), 'macro_f1_pct': np.float64(37.49), 'potential_fit_recall_pct': np.float64(26.19), 'good_fit_precision_pct': np.float64(35.8), 'good_fit_recall_pct': np.float64(10.03)} 
+M1_LogReg_C1_balanced {'accuracy_pct': np.float64(48.8), 'macro_f1_pct': np.float64(39.36), 'potential_fit_recall_pct': np.float64(40.14), 'good_fit_precision_pct': np.float64(34.74), 'good_fit_recall_pct': np.float64(11
+M2_LinearSVC_C1_balanced {'accuracy_pct': np.float64(48.19), 'macro_f1_pct': np.float64(38.43), 'potential_fit_recall_pct': np.float64(32.65), 'good_fit_precision_pct': np.float64(34.58), 'good_fit_recall_pct': np.float6
+TRAIN label overlay applied: 255
+M3 features (4993, 72) in 71.4 s
+M3 mean {'accuracy_pct': 55.56, 'macro_f1_pct': 43.23, 'potential_fit_recall_pct': 39.12, 'good_fit_precision_pct': 59.94, 'good_fit_recall_pct': 11.29}

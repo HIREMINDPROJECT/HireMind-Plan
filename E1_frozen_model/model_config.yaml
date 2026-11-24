@@ -1,0 +1,39 @@
+# HireMind — E1 freeze: model_config.yaml   STATUS: FROZEN (24 Nov 2026)
+model_id: HireMind_M4_knowledge_v1_D0_seed46
+selection: "E4 preset rule: no challenger eligible -> keep strongest defensible baseline (M4). Frozen seed = closest to the 8-seed mean (not the best seed)."
+purpose: decision support only; HR makes every decision; no automatic hiring or rejection
+classes: {0: No Fit, 1: Potential Fit, 2: Good Fit}
+base_model: google/bert_uncased_L-2_H-128_A-2
+base_model_revision: 30b0a37ccaaa32f332884b96992754e246e48c5f
+tokenizer: same as base_model (uncased WordPiece), pair encoding (CV, job), truncation longest_first, max_len 512, padding max_length
+knowledge_feature: "Knowledge v1 line (knowledge_v1_ORIGINAL.py) prepended to the job text, computed from the full CV and job texts"
+training_labels: D0 (original TRAIN labels, 4,993 rows)
+training:
+  optimizer: AdamW
+  lr: 1.0e-4
+  weight_decay: 0.01
+  warmup_fraction: 0.10
+  grad_clip: 1.0
+  batch_size: 16
+  epochs: 3
+  updates: 939
+  eval_every: 100
+  checkpoint_rule: best validation macro-F1 (first best wins ties)
+  seed: 46
+  device: cpu
+weights:
+  file: a1_knowledge_M4_seed46_weights.pt
+  sha256: 0953ce892ee0f075d37c1e6b4ff0bceb02a7932fddbca0ee5954f5e17fcb0c8e
+  bytes: 17558120
+  best_step: 600
+data:
+  dataset: cnamuangtoun/resume-job-description-fit
+  dataset_revision: 08978e21714984bb417547d2c0f9b477f5298163
+  train_csv_sha256: b86fa488a21258015de1750633a9ac410f701ff96bf533f68978dbe3adec6d40
+  splits_csv_sha256: 2ff3926c70152e6d5f47fbf40acebbb287e3311969618a8c7a20f45861539f9b
+  split: {train: 4993, validation: 1162, test: 1759}
+  test_set: opened earlier by the team; not used for any selection; no test number reported
+validation_metrics_frozen_seed46: {accuracy: 56.97, macro_f1: 48.80, good_fit_recall: 38.41, good_fit_precision: 43.87, potential_fit_recall: 27.21}
+validation_metrics_8_seed_mean_sd: {accuracy: [56.79, 1.17], macro_f1: [48.61, 2.80], good_fit_recall: [36.72, 11.28], good_fit_precision: [43.68, 4.64], potential_fit_recall: [29.68, 4.54]}
+packages: {python: "3.12", torch: "2.15.0+cpu", transformers: "4.51.3", pandas: "2.2.3", scikit-learn: "1.6.1", huggingface-hub: "0.30.2", numpy: "2.5.5"}
+structured_evidence_for_HR_view: {extractor: structured_extractor.py v3.1, schema: structured_evidence_schema_v3.json}

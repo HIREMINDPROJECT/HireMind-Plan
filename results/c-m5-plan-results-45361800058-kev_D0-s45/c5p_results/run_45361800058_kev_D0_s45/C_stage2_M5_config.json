@@ -1,0 +1,17 @@
+{
+ "model": "distilbert-base-uncased",
+ "revision": "12040accade4e8a0f71eabdb258fecc2e7e948be",
+ "seed": 45,
+ "epochs": 3,
+ "batch": 16,
+ "lr": 3e-05,
+ "max_len": 384,
+ "probe": null,
+ "checkpoint_rule": "best validation macro-F1 (same as M4; optimistic)",
+ "input_path": "B4 evidence selection + Knowledge v1 line, as E2",
+ "micro_batch": 4,
+ "stopped_early_by_wall_guard": false,
+ "test_set_read": false,
+ "labels": "D0",
+ "torch": "2.15.0+cpu"
+}

@@ -1,0 +1,17 @@
+model,train_labels,input,seeds,accuracy,macro_f1,good_fit_recall,good_fit_precision,potential_fit_recall,sd_accuracy,sd_gf_recall,note,eligible_vs_M4_D0
+M1 LogReg TF-IDF,D0,full text (TF-IDF),deterministic,51.55,35.34,9.0,48.15,16.67,,,,no
+M2 LinearSVC TF-IDF,D0,full text (TF-IDF),deterministic,50.86,39.34,13.84,38.84,26.19,,,,no
+M1 LogReg TF-IDF,D1,full text (TF-IDF),deterministic,51.64,34.84,6.23,54.55,19.39,,,,no
+M2 LinearSVC TF-IDF,D1,full text (TF-IDF),deterministic,50.17,37.49,10.03,35.8,26.19,,,,no
+M3 XGBoost (B1 features),D0,structured B1 v3.1 features,8 (42-49),54.83,43.49,14.23,45.61,36.27,0.78,2.03,,no
+M3 XGBoost (B1 features),D1,structured B1 v3.1 features,8 (42-49),55.56,43.23,11.29,59.94,39.12,0.47,1.12,,no
+M4 BERT-Tiny + Knowledge v1 (E0),D0,512-token pair + Knowledge line,8 (42-49),56.79,48.61,36.72,43.68,29.68,1.17,11.28,,reference
+M4 BERT-Tiny + Knowledge v1 (E1),D1,512-token pair + Knowledge line,8 (42-49),56.12,47.04,24.91,48.65,35.12,0.86,5.17,,no
+M4 + evidence input (E2),D0,B4 evidence selection + Knowledge line,8 (42-49),56.3,48.69,41.52,42.99,27.76,1.55,12.39,,no
+M4 + evidence input (E2),D1,B4 evidence selection + Knowledge line,8 (42-49),56.12,47.58,24.91,50.96,38.27,1.13,4.03,,no
+M5 DistilBERT,D0,384-token pair,1 (42),50.6,39.32,12.46,32.43,30.95,,,single seed; 384 tokens (CPU budget),no
+M6 MiniLM + LogReg,D0,sentence embeddings,deterministic,54.65,48.71,24.22,51.85,53.4,,,not part of the team decision (DistilBERT only); reported for completeness,no
+M8 DistilBERT hybrid (full),D0,evidence/Knowledge/structured as per variant (512 tokens),1 (42),53.96,45.48,32.87,42.22,25.17,,,best epoch 2; stopped after 2 epochs by the time guard,no
+M8 DistilBERT hybrid (minus_evidence),D0,evidence/Knowledge/structured as per variant (512 tokens),1 (42),52.32,42.95,24.22,45.16,26.19,,,best epoch 3,no
+M8 DistilBERT hybrid (minus_knowledge),D0,evidence/Knowledge/structured as per variant (512 tokens),1 (42),53.01,44.59,38.41,36.75,20.41,,,best epoch 2,no
+M8 DistilBERT hybrid (minus_struct),D0,evidence/Knowledge/structured as per variant (512 tokens),1 (42),54.13,49.02,48.79,41.23,30.61,,,best epoch 3,no

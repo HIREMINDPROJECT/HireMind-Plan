@@ -1,0 +1,14 @@
+issue,count,example_row_uids,evidence_source,status
+Rows in TRAIN,4993,-,splits.csv + dataset load check,VERIFIED
+Empty CV text,0,none,text job,VERIFIED
+Empty job text,0,none,text job,VERIFIED
+Short CV text (<100 words),2,train_45;train_1099;train_652,text job,VERIFIED
+Short job text (<50 words),193,train_236;train_1033;train_1136,text job,VERIFIED
+Exact duplicate CV-job pairs,0,none,text job + manifest,VERIFIED
+Conflicting labels for the same pair,0,none,manifest,VERIFIED
+"Near-duplicate CV texts (distinct cv_id, cosine>=0.90, nearest 3 neighbours)",50,train_258;train_114;train_829,text job; see A2_text_issue_examples.csv for the cv_id pairs,"VERIFIED (lexical, 0.90 threshold)"
+"Near-duplicate job texts (distinct job_id, cosine>=0.90)",2,train_7;train_188,text job,"VERIFIED (lexical, 0.90 threshold)"
+CV IDs shared with validation/test,551,train_1279;train_550;train_387,manifest; 551 of 636 TRAIN CV IDs,VERIFIED
+Job groups in more than one split,0,none,manifest,VERIFIED
+Job groups with <5 TRAIN rows,20,train_3937;train_129;train_1057,manifest (3 singleton groups),VERIFIED
+Pairs over 512 tokens (CV+job+3 special),4972,train_2391;train_5032;train_5224,99.58% of TRAIN; pinned BERT-Tiny tokenizer,VERIFIED

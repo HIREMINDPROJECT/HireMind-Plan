@@ -1,0 +1,33 @@
+{
+  "PT-02": {
+    "cvs": 50,
+    "p95_s": 0.117,
+    "max_s": 0.128,
+    "target_s": 120,
+    "parsed": 50,
+    "fit_predictions": 50,
+    "pass": true
+  },
+  "PT-01": {
+    "requests": 200,
+    "users": 10,
+    "p95_ms": 1052,
+    "max_ms": 1285,
+    "errors": 0,
+    "target_ms": 2000,
+    "pass": true
+  },
+  "PT-03": {
+    "submitted": 100,
+    "accepted": 100,
+    "stored": 100,
+    "unique": 100,
+    "parsed": 100,
+    "pass": true
+  },
+  "RP-01": {
+    "evaluations": 5,
+    "distinct_scores": 1,
+    "pass": true
+  }
+}

@@ -1,0 +1,30 @@
+ "requirements_with_semantic_score": 48898,
+ "similarity_by_exact_status": {
+  "exact_found": {
+   "n": 13295,
+   "mean": 0.8705,
+   "q10_q50_q90": [
+    0.8121,
+    0.8779,
+    0.9205
+   ]
+  },
+  "not_found_unknown": {
+   "n": 33269,
+   "mean": 0.8588,
+   "q10_q50_q90": [
+    0.7958,
+    0.8658,
+    0.9107
+   ]
+  },
+  "exact_negative": {
+   "n": 0,
+   "mean": null,
+   "q10_q50_q90": null
+  }
+ },
+ "missing_indicator_total": 5403,
+ "semantic_only_total": 30200,
+ "note": "Scores and offsets only. 'missing' = no supporting evidence found, not 'lacks the skill'."
+}

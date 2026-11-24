@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HR evidence review prototype v3</title>
+<style>
+:root{--bg:#fbfaf7;--fg:#1c1b19;--mut:#6b6860;--card:#fff;--line:#e3e0d8;--ok:#1b7a43;--neg:#b3261e;--unk:#6b6860;--unc:#a15c00;--lvl:#1c5fa8;--hl:#fff3b8}
+@media (prefers-color-scheme:dark){:root{--bg:#171614;--fg:#eeece6;--mut:#a39f94;--card:#211f1c;--line:#3a3732;--ok:#5fcf8a;--neg:#ff8a80;--unk:#a39f94;--unc:#f0b35a;--lvl:#7db4f0;--hl:#5a4d10}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:16px}
+.banner{border:2px solid var(--unc);border-radius:8px;padding:10px 14px;background:var(--card);margin-bottom:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:800px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:14px}
+h1{font-size:20px;margin:0 0 8px}h2{font-size:16px;margin:0 0 8px}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:6px 4px;vertical-align:top;font-size:14px}
+.chip{display:inline-block;border:1px solid currentColor;border-radius:99px;padding:0 8px;font-size:12px;white-space:nowrap}
+.FOUND_EXPLICIT{color:var(--ok)}.FOUND_EXPLICIT_NEGATIVE{color:var(--neg)}.FOUND_UNCLEAR{color:var(--unc)}.NOT_STATED_UNKNOWN{color:var(--unk)}.LEVEL_MET{color:var(--lvl)}.LEVEL_BELOW_REQUIRED{color:var(--neg)}.YEARS_STATED_NOT_COMPARED{color:var(--unc)}
+.txt{white-space:pre-wrap;max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:6px;padding:8px;font-size:13px;background:var(--bg)}
+mark{background:var(--hl);color:inherit;border-radius:3px;padding:0 1px}
+button,select,textarea,input{font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:4px 8px}
+button{cursor:pointer}button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--lvl)}
+.bars div{display:flex;align-items:center;gap:8px;margin:2px 0}.bars span.b{display:inline-block;height:10px;background:var(--lvl);border-radius:3px}
+.muted{color:var(--mut);font-size:13px}#msg{min-height:1.5em;margin:6px 0;font-weight:600}#msg.err{color:var(--neg)}#msg.ok{color:var(--ok)}mark.focus{outline:2px solid var(--lvl)}.ev{font-size:13px;margin:4px 0 0 0;padding-left:16px}button.link{border:none;background:none;color:var(--lvl);text-decoration:underline;padding:0 2px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}#attn{border-left:4px solid var(--unc)}#attn ul{margin:4px 0;padding-left:18px}tr.attn td:first-child{border-left:4px solid var(--unc);padding-left:8px;font-weight:600}.why{font-size:12px;color:var(--mut);margin-top:2px}#nosug{border-left:4px solid var(--lvl)}
+</style></head><body><main>
+<h1>HR evidence review <span class="muted">· prototype v3, advice only</span></h1>
+<div class="banner" role="note"><b>Advice only.</b> This tool never accepts or rejects a candidate. The final decision is always made by an HR reviewer. "Not documented in the CV" means the CV does not mention it. It is <b>not</b> evidence that the candidate lacks it.</div>
+<div id="msg" role="status" aria-live="polite"></div>
+<div class="card"><div class="row"><label>Load a case JSON: <input type="file" id="file" accept=".json"></label><button id="demo">Load built-in SYNTHETIC demo</button></div>
+<p class="muted">Case files built from real CVs contain CV text. Keep them private. Nothing is uploaded: this page runs entirely in your browser.</p></div>
+<div id="app" hidden>
+ <div class="card" id="pred"></div>
+ <div class="card" id="attn" hidden role="region" aria-label="Check these first"></div>
+ <div class="card"><h2>Job requirements and CV evidence</h2><div class="row"><label>Show <select id="flt"><option value="">all requirements</option></select></label><span class="muted" id="cnt"></span></div><table><thead><tr><th>Requirement</th><th>Type</th><th>CV status</th><th>HR check</th></tr></thead><tbody id="reqs"></tbody></table></div>
+ <div class="grid"><div class="card"><h2>CV (evidence highlighted)</h2><div class="txt" id="cv"></div></div><div class="card"><h2>Job description</h2><div class="txt" id="jd"></div></div></div>
+ <div class="card"><h2>HR decision (yours, not the model's)</h2>
+  <div class="row"><label>Decision <select id="dec"><option value="">— choose —</option><option>Good Fit</option><option>Potential Fit</option><option>No Fit</option><option>Needs manual review</option></select></label>
+  <label>Reason (required if it differs from the suggestion) <input id="why" size="48"></label><button id="save">Save audit record (download JSON)</button></div></div>
+</div>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const NAMES={FOUND_EXPLICIT:"Found in CV",FOUND_EXPLICIT_NEGATIVE:"CV says not used (explicit)",FOUND_UNCLEAR:"Mentioned, unclear",NOT_STATED_UNKNOWN:"Not mentioned",LEVEL_MET:"Level met",LEVEL_BELOW_REQUIRED:"Below the required level",YEARS_STATED_NOT_COMPARED:"Years stated, not compared"};
+let C=null,checks={},dirty=false;
+const EXPLAIN={NOT_STATED_UNKNOWN:"The CV does not mention it. This is not evidence that the candidate lacks it.",YEARS_STATED_NOT_COMPARED:"Years are stated in the job; the tool did not compare them with the CV.",LEVEL_BELOW_REQUIRED:"The CV states a lower level than the job asks for."};
+function say(t,kind){const m=$("msg");m.className=kind||"";m.textContent=t}
+window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
+function cps(s){return Array.from(s)}
+function merge(spans,n){const sp=spans.filter(s=>s[0]<s[1]&&s[1]<=n).map(s=>[s[0],s[1]]).sort((x,y)=>x[0]-y[0]||x[1]-y[1]);const out=[];for(const s of sp){const l=out[out.length-1];if(l&&s[0]<=l[1])l[1]=Math.max(l[1],s[1]);else out.push(s)}return out}
+function mark(parent,text,spans,prefix){const a=cps(text);const sp=merge(spans,a.length);let p=0;parent.textContent="";
+ sp.forEach(([s,e],k)=>{parent.append(a.slice(p,s).join(""));const m=document.createElement("mark");m.id=prefix+"_"+s;m.dataset.s=s;m.dataset.e=e;m.tabIndex=-1;m.textContent=a.slice(s,e).join("");parent.append(m);p=e});
+ parent.append(a.slice(p).join(""))}
+function jump(prefix,pos){const ms=[...document.querySelectorAll("#"+(prefix==="cv"?"cv":"jd")+" mark")];const m=ms.find(x=>+x.dataset.s<=pos&&pos<+x.dataset.e);if(!m)return;document.querySelectorAll("mark.focus").forEach(x=>x.classList.remove("focus"));m.classList.add("focus");m.scrollIntoView({block:"center"});m.focus()}
+function excerpt(text,s,e){return cps(text).slice(s,e).join("")}
+function render(){
+ $("app").hidden=false;checks={};dirty=false;say("Case "+C.case_id+" loaded.","ok");
+ const fl=$("flt");fl.length=1;[...new Set(C.requirements.map(r=>r.status))].forEach(st=>{const o=document.createElement("option");o.value=st;o.textContent=NAMES[st]||st;fl.append(o)});fl.value="";
+ const pr=$("pred");pr.textContent="";const h=document.createElement("h2");h.textContent="Model suggestion (advice only)";pr.append(h);
+ if(C.prediction){const P=C.prediction;const d=document.createElement("div");d.textContent="Suggested: "+P.label+(P.abstain?"  (low confidence: please review manually)":"");d.style.fontWeight="600";pr.append(d);
+  const b=document.createElement("div");b.className="bars";for(const [k,v] of Object.entries(P.probabilities)){const r=document.createElement("div");const l=document.createElement("span");l.textContent=k+" "+(100*v).toFixed(0)+"%";l.style.minWidth="130px";const bar=document.createElement("span");bar.className="b";bar.style.width=(200*v)+"px";r.append(l,bar);b.append(r)}pr.append(b)}
+ else{const d=document.createElement("div");d.id="nosug";d.className="card";d.setAttribute("role","note");d.textContent="No suggestion is available for this case. Decide from the evidence below, or mark it for manual review. ";const b=document.createElement("button");b.id="tomanual";b.textContent="Mark as Needs manual review";b.onclick=()=>{$("dec").value="Needs manual review";dirty=true;$("dec").focus();say("Decision set to Needs manual review. Add a note and save when ready.","ok")};d.append(b);pr.append(d)}
+ const tb=$("reqs");tb.textContent="";
+ C.requirements.forEach((r,i)=>{const tr=document.createElement("tr");
+  tr.dataset.status=r.status;tr.id="row_"+i;if(needsCheck(r))tr.className="attn";const c1=document.createElement("td");c1.textContent=r.value+" ("+r.category.toLowerCase().replace("_"," ")+")";
+  if(Array.isArray(r.job_span)&&r.job_span[0]<r.job_span[1]){const b=document.createElement("button");b.className="link";b.textContent="in job";b.setAttribute("aria-label","Show "+r.value+" in the job description");b.onclick=()=>jump("jd",r.job_span[0]);c1.append(" ",b)}
+  const ev=(r.cv_spans||[]).filter(x=>x[0]<x[1]&&x[1]<=cps(C.cv_text).length);if(ev.length){const ul=document.createElement("ul");ul.className="ev";ev.forEach(x=>{const li=document.createElement("li");const b=document.createElement("button");b.className="link";b.textContent="CV: \u201c"+excerpt(C.cv_text,x[0],x[1])+"\u201d";b.setAttribute("aria-label","Show this evidence in the CV");b.onclick=()=>jump("cv",x[0]);li.append(b);ul.append(li)});c1.append(ul)}
+  const c2=document.createElement("td");c2.textContent=r.requirement_type.toLowerCase();
+  const c3=document.createElement("td");const ch=document.createElement("span");ch.className="chip "+r.status;ch.textContent=NAMES[r.status]||r.status;c3.append(ch);const ex=EXPLAIN[r.status];if(ex){const w=document.createElement("div");w.className="why";w.textContent=ex;c3.append(w)}
+  const c4=document.createElement("td");const sel=document.createElement("select");sel.setAttribute("aria-label","HR check for "+r.value);
+  for(const o of ["","Extraction is correct","Extraction is wrong","Evidence is elsewhere in the CV"]){const op=document.createElement("option");op.textContent=o||"— check —";op.value=o;sel.append(op)}
+  sel.onchange=()=>{checks[r.requirement_id]=sel.value;dirty=true};c4.append(sel);
+  tr.append(c1,c2,c3,c4);tb.append(tr)});
+ attention();mark($("cv"),C.cv_text,C.requirements.flatMap(r=>(r.cv_spans||[]).map(s=>[s[0],s[1]])),"cv");
+ mark($("jd"),C.job_text,C.requirements.map(r=>r.job_span).filter(Array.isArray),"jd");filter();
+}
+function needsCheck(r){const req=r.requirement_type==="REQUIRED";return (req&&(r.status==="NOT_STATED_UNKNOWN"||r.status==="FOUND_EXPLICIT_NEGATIVE"))||r.status==="LEVEL_BELOW_REQUIRED"||(req&&r.status==="YEARS_STATED_NOT_COMPARED")}
+function attnText(r){const cat=(r.category||"").toLowerCase().replace("_"," ");
+ if(r.status==="LEVEL_BELOW_REQUIRED")return (r.category==="EXPERIENCE"?"Experience below the requirement: ":"Below the required level: ")+r.value;
+ if(r.status==="YEARS_STATED_NOT_COMPARED")return "Years of experience required ("+r.value+"): compare with the CV dates yourself";
+ if(r.status==="FOUND_EXPLICIT_NEGATIVE")return "Required, and the CV says it was not used: "+r.value;
+ return "Required but not mentioned in the CV"+(/certif/i.test(cat)?" (certification)":"")+": "+r.value}
+function attention(){const a=$("attn");a.textContent="";const list=C.requirements.map((r,i)=>[r,i]).filter(([r])=>needsCheck(r));
+ const rank=([r])=>/certif/i.test(r.category||"")?0:(r.status==="LEVEL_BELOW_REQUIRED"||r.status==="YEARS_STATED_NOT_COMPARED")?1:2;list.sort((x,y)=>rank(x)-rank(y));
+ a.hidden=!list.length;if(!list.length)return;const h=document.createElement("h2");h.textContent="Check these first ("+list.length+")";a.append(h);
+ const p=document.createElement("div");p.className="muted";p.textContent="Required items the CV does not show, and experience or level gaps. They are points to verify, not reasons to reject on their own.";a.append(p);
+ const ul=document.createElement("ul");list.forEach(([r,i])=>{const li=document.createElement("li");const b=document.createElement("button");b.className="link";b.textContent=attnText(r);b.onclick=()=>{$("flt").value="";filter();const tr=$("row_"+i);tr.scrollIntoView({block:"center"});tr.querySelector("select").focus()};li.append(b);ul.append(li)});a.append(ul)}
+function filter(){const v=$("flt").value;let n=0;document.querySelectorAll("#reqs tr").forEach(tr=>{const show=!v||tr.dataset.status===v;tr.hidden=!show;n+=show});$("cnt").textContent=n+" of "+C.requirements.length+" shown"}
+$("flt").onchange=filter;
+$("dec").onchange=()=>{dirty=true};$("why").oninput=()=>{dirty=true};
+function load(o){if(!o||!Array.isArray(o.requirements)||typeof o.cv_text!=="string"){say("Not a valid case file.","err");return}if(dirty&&!confirmSwitch())return;C=o;$("dec").value="";$("why").value="";render()}
+function confirmSwitch(){say("You have an unsaved decision. Save it first, or load the case again to discard it.","err");dirty=false;return false}
+$("file").onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{load(JSON.parse(rd.result))}catch(x){say("Could not read the file (not valid JSON).","err")}};rd.readAsText(f)};
+$("demo").onclick=()=>fetch("demo_case_SYNTHETIC.json").then(r=>r.json()).then(load).catch(()=>say("Open this page next to demo_case_SYNTHETIC.json (or use 'Load a case JSON').","err"));
+$("save").onclick=()=>{if(!C)return;const dec=$("dec").value,why=$("why").value.trim();
+ if(!dec){say("Choose a decision first. The tool never decides for you.","err");$("dec").focus();return}
+ const sug=C.prediction?C.prediction.label:null;if(sug&&dec!==sug&&!why){say("Please give a reason when your decision differs from the suggestion.","err");$("why").focus();return}
+ const rec={case_id:C.case_id,saved_at:new Date().toISOString(),suggestion:sug,hr_decision:dec,hr_reason:why,overridden:!!sug&&dec!==sug,evidence_checks:checks,note:"Advice-only tool. Decision made by a human reviewer."};
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(rec,null,1)],{type:"application/json"}));a.download="hr_audit_"+C.case_id+".json";a.click();dirty=false;say("Audit record saved (downloaded). Store it in the approved location; it contains no CV text.","ok")};
+</script></main></body></html>

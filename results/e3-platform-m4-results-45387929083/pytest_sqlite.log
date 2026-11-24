@@ -1,0 +1,63 @@
+.........................................FFF............................ [ 69%]
+...............................                                          [100%]
+=================================== FAILURES ===================================
+__________ test_fr09_prediction_is_stored_when_the_candidate_applies ___________
+
+client = <starlette.testclient.TestClient object at 0x7ccd79c68170>
+
+    def test_fr09_prediction_is_stored_when_the_candidate_applies(client):
+        hr, jid, app_id, model = applied(client, p_good=0.5)
+        cv, job = model.seen[0]
+        assert "Sara Ahmed" in cv and "Data Analyst" in job and "Required skills: sql, python" in job
+        fit = client.get(f"/api/applications/{app_id}/fit", headers=hr).json()
+        p = fit["prediction"]
+>       assert p["label"] == "Good Fit" and abs(sum(p["probabilities"].values()) - 1) < 1e-9
+E       TypeError: 'NoneType' object is not subscriptable
+
+tests/test_fit.py:37: TypeError
+------------------------------ Captured log call -------------------------------
+WARNING  hiremind.fit:fit.py:38 No fit prediction for application 1: '>=' not supported between instances of 'float' and 'str'
+_________________ test_fr09_review_flag_follows_the_threshold __________________
+
+client = <starlette.testclient.TestClient object at 0x7ccd79822390>
+
+    def test_fr09_review_flag_follows_the_threshold(client):
+        t = fit_model.CARD["review_threshold"]
+        hr, _, app_id, _ = applied(client, p_good=t)  # at the threshold: flagged even though No Fit is the top label
+        p = client.get(f"/api/applications/{app_id}/fit", headers=hr).json()["prediction"]
+>       assert p["needs_hr_review"] is True
+E       TypeError: 'NoneType' object is not subscriptable
+
+tests/test_fit.py:47: TypeError
+------------------------------ Captured log call -------------------------------
+WARNING  hiremind.fit:fit.py:38 No fit prediction for application 1: unsupported operand type(s) for -: 'int' and 'str'
+_________________ test_fr09_prediction_never_changes_the_score _________________
+
+client = <starlette.testclient.TestClient object at 0x7ccd79aa1cd0>
+
+    def test_fr09_prediction_never_changes_the_score(client):
+        hr = login(client, "hr1@hm.test")
+        jid = published_job(client, hr)
+        scores, labels = [], []
+        for i, p_good in enumerate((0.05, 0.95)):
+            fit_model.set_backend(fake(p_good))
+            app_id = upload(client, candidate(client, f"c{i}@hm.test"), jid, "sara.pdf", make_pdf()).json()["id"]
+            assert client.put(f"/api/applications/{app_id}/ratings", headers=hr,
+                              json={"exp": 70, "edu": 70, "soft": 70}).status_code == 200
+            scores.append(client.post(f"/api/applications/{app_id}/evaluate", headers=hr).json()["score"])
+>           labels.append(client.get(f"/api/applications/{app_id}/fit", headers=hr).json()["prediction"]["label"])
+E           TypeError: 'NoneType' object is not subscriptable
+
+tests/test_fit.py:64: TypeError
+------------------------------ Captured log call -------------------------------
+WARNING  hiremind.fit:fit.py:38 No fit prediction for application 1: '>=' not supported between instances of 'float' and 'str'
+=============================== warnings summary ===============================
+../../../../../../../opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/starlette/testclient.py:40
+  /opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /home/runner/work/HireMind-DL/HireMind-DL/junit_sqlite.xml -
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_fit_model.py:7: could not import 'torch': No module named 'torch'
+3 failed, 100 passed, 1 skipped, 1 warning in 22.65s

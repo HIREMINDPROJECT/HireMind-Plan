@@ -1,0 +1,26 @@
+{
+ "cases": 400,
+ "review_groups": {
+  "AGREE_WITH_D0": 98,
+  "AGREE_DIFFERENT_FROM_D0": 164,
+  "R1_R2_DISAGREE": 138
+ },
+ "decisions": {
+  "NO_CHANGE_ALL_AGREE": 98,
+  "CONFIRMED_ERROR": 255,
+  "KEEP_D0": 47
+ },
+ "confirmed_label_errors": 255,
+ "flagged_but_not_errors": {
+  "KEEP_D0_after_review": 47,
+  "all_three_agree": 98
+ },
+ "train_cases_flagged_for_review_priority_total": 1949,
+ "note_flagged": "1,949 TRAIN cases were flagged by Cleanlab/boundary scores for review priority; only the 400 sampled were reviewed; only 255 are confirmed errors. Flags are not errors.",
+ "reviewer_agreement": {
+  "percent": 65.5,
+  "cohen_kappa": 0.365,
+  "disagreements": 138
+ },
+ "names_file_decisions_consistent": "302/302"
+}

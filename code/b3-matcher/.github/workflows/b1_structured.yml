@@ -1,0 +1,46 @@
+name: b1-structured
+on:
+  workflow_dispatch:
+  push:
+    branches: [b1-structured]
+    paths: ['b1/**', '.github/workflows/b1_structured.yml']
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pinned HireMind-DL code and data loader
+        run: |
+          git clone -q https://github.com/Hams770/HireMind-DL.git _dl && git -C _dl checkout -q 1f22f34462c400f884bb0a00f061dbea0bd687d5
+      - name: Install
+        run: |
+          pip install pandas==2.2.3 scikit-learn==1.6.1 huggingface-hub==0.30.2 transformers==4.51.3 numpy scipy jsonschema
+          pip freeze > pip_freeze.txt
+      - name: Unit tests (synthetic text)
+        run: cd b1 && python test_b1.py
+      - name: Build structured pairs (offsets/hashes only)
+        id: build
+        continue-on-error: true
+        shell: bash
+        run: |
+          mkdir -p out
+          python b1/build_structured_pairs.py _dl out 2>&1 | tail -15 | cut -c1-160 | sed 's/^/LOG: /' | tee out/build_log_tail.txt
+      - name: Commit outputs (no text)
+        if: always()
+        run: |
+          ls -la out | tee out/file_sizes.txt
+          for f in out/*.jsonl; do gzip -9 -f "$f"; done
+          mkdir -p b1_results/run_${{ github.run_id }} && cp out/* pip_freeze.txt b1_results/run_${{ github.run_id }}/
+          du -sh b1_results
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git checkout -b b1-results-${{ github.run_id }}
+          git add -f b1_results && git commit -qm "B1 structured pairs ${{ github.run_id }} (no raw text)"
+          git push origin b1-results-${{ github.run_id }}
+      - name: Fail the job if the build failed
+        if: steps.build.outcome == 'failure'
+        run: exit 1

@@ -1,0 +1,4 @@
+epoch,step,inference_ms_per_pair,accuracy_pct,macro_f1_pct,no_fit_precision_pct,no_fit_recall_pct,no_fit_f1_pct,potential_fit_precision_pct,potential_fit_recall_pct,potential_fit_f1_pct,good_fit_precision_pct,good_fit_recall_pct,good_fit_f1_pct
+1,313,241.13,51.1188,36.7237,55.9735,87.3921,68.2401,28.2443,12.585,17.4118,40.1575,17.6471,24.5192
+2,626,241.75,52.5818,48.9713,70.0,62.867,66.242,36.4486,39.7959,38.0488,40.4984,44.9827,42.623
+3,939,244.76,53.7866,45.9422,65.8754,76.6839,70.8699,34.7134,37.0748,35.8553,41.3793,24.9135,31.1015

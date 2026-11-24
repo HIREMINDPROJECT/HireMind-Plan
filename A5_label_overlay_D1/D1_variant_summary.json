@@ -1,0 +1,40 @@
+{
+  "dataset_variant": "D1 classification overlay",
+  "source_split": "splits.csv",
+  "source_split_sha256": "2ff3926c70152e6d5f47fbf40acebbb287e3311969618a8c7a20f45861539f9b",
+  "source_review": "A4_400_completed_evidence_recommendations.csv",
+  "source_review_sha256": "b43fdc75c285dbfc458cc129767f541b2280f5f9c69092d669a74096579d0362",
+  "train_count": 4993,
+  "validation_count": 1162,
+  "test_count": 1759,
+  "a4_case_count": 400,
+  "changed_train_labels": 255,
+  "retained_a4_labels": 145,
+  "total_train_labels_unchanged": 4738,
+  "train_distribution_D0": {
+    "No Fit": 2533,
+    "Potential Fit": 1231,
+    "Good Fit": 1229
+  },
+  "train_distribution_D1": {
+    "No Fit": 2615,
+    "Potential Fit": 1337,
+    "Good Fit": 1041
+  },
+  "transitions": {
+    "Good Fit -> No Fit": 75,
+    "Good Fit -> Potential Fit": 119,
+    "No Fit -> Potential Fit": 24,
+    "Potential Fit -> Good Fit": 6,
+    "Potential Fit -> No Fit": 31
+  },
+  "source_approval_count_documented": 0,
+  "data_handling": "Original D0 source file not modified. Non-train splits preserved byte-for-byte at row-value level.",
+  "file_sha256": {
+    "train_labels_v1.csv": "001212500c11a2d471845272718bda0e458968293d551d4979d6331226c178c5",
+    "splits_D1.csv": "85af2593fc785d258e983d52407dc5df40737286e2fc5cf238f28ecfaa2668d2",
+    "change_log.csv": "ca853a1ff102a0293af2fd47f9c28dca709fba9571ca242c2f48a1b873239df5",
+    "change_log_ids_only.csv": "9344fa713afd7fa7e0e22c5287503cd45d7a4ceba16a6174381e45185d57954c",
+    "A4_400_case_decisions.csv": "0e0c89726c68227c46cfb0b0873d2b8f60e32fdb13f3484b271e26f73e7c0a52"
+  }
+}

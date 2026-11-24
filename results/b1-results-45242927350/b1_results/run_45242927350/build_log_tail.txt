@@ -1,0 +1,6 @@
+LOG: Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the pack
+LOG: Traceback (most recent call last):
+LOG:   File "/home/runner/work/HireMind-DL/HireMind-DL/b1/build_structured_pairs.py", line 42, in <module>
+LOG:     res["pair_id"], res["cv_id"], res["job_id"] = r.pair_id, r.cv_id, r.job_id
+LOG:                                                   ^^^^^^^^^
+LOG: AttributeError: 'Pandas' object has no attribute 'pair_id'

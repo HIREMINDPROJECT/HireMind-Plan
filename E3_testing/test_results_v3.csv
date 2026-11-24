@@ -1,0 +1,34 @@
+id,test,result,detail
+V01,page loads with no console errors,PASS,
+V02,advice-only banner; wording 'not evidence' of absence,PASS,
+V03,demo loads; rows = requirements,PASS,
+V04,abstain shown as low confidence,PASS,
+V05,"UX-01 no decision: inline message, no browser dialog",PASS,Choose a decision first. The tool never decides for you.
+V06,"UX-01 override without reason: inline message, focus on reason",PASS,
+V07,audit record content and no CV text,PASS,
+V08,save confirmation shown,PASS,
+V09,no request leaves localhost,PASS,
+V10,"HTML in texts not executed, shown literally",PASS,
+V11,"UX-01 invalid JSON: inline error, app hidden, no dialog",PASS,Could not read the file (not valid JSON).
+V12,wrong schema: inline error,PASS,
+V13,emoji offsets highlight correctly,PASS,
+V14,UX-02 overlapping spans merged: both passages highlighted,PASS,['Senior Python developer']
+V15,UX-02/08 evidence list shows each excerpt per requirement,PASS,"['CV: “Senior Python”', 'CV: “Python developer”']"
+V16,UX-08 jump-to-source focuses the highlight,PASS,
+V17,UX-07 filter by evidence status (300 rows),PASS,150 visible
+V18,300-requirement case renders in < 3 s,PASS,0.31s
+V19,UX-03 loading another case with an unsaved decision is stopped once,PASS,
+V20,second load discards and opens the new case,PASS,
+V21,UX-03 leaving the page with unsaved input (after a real user gesture) triggers the browser warning,PASS,['beforeunload']
+V22,HR checks do not leak between cases,PASS,
+V23,controls have accessible names,PASS,
+V24,no browser alert() used anywhere,PASS,
+W01,ISS-07/08 'Check these first' lists required-not-mentioned and years items (demo: 2),PASS,"['Years of experience required (5 years): compare with the CV dates yourself', 'Required but not mentioned in the CV: kubernetes']"
+W02,ISS-10 short status 'Not mentioned' with explanation underneath,PASS,
+W03,ISS-08 flagged rows are marked in the table,PASS,
+W04,attention card says these are not reasons to reject,PASS,
+W05,ISS-08 required certification ranked first and labelled,PASS,"['Required but not mentioned in the CV (certification): CPA', 'Experience below the requirement: 4 years', 'Required but not mentioned in the CV: skill0']"
+W06,ISS-07 experience below requirement shown as explicit warning,PASS,"['Required but not mentioned in the CV (certification): CPA', 'Experience below the requirement: 4 years', 'Required but not mentioned in the CV: skill0']"
+W07,attention item jumps to its row (clears the filter) and focuses the HR check,PASS,
+W08,preferred-not-mentioned is not flagged; card hidden when nothing to check,PASS,
+W09,"ISS-09 no-suggestion notice with next action; manual review saved, no override",PASS,"{""case_id"": ""t1"", ""saved_at"": ""2026-11-24T01:49:06.117Z"", ""suggestion"": null, ""hr_decision"": ""Needs manual review"", ""hr_"

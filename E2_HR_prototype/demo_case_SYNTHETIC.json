@@ -1,0 +1,142 @@
+{
+ "case_id": "synthetic_demo_1",
+ "cv_text": "Summary. Data analyst with 4 years of experience. Skills. Python, SQL, Excel. Experience. Built dashboards in Excel and wrote SQL reports for finance. Never used Tableau. Interested in learning Docker. Education. Bachelor of Science in Statistics.",
+ "job_text": "Requirements. Python required. SQL required. Tableau is a plus. Docker preferred. Kubernetes required. Bachelor's degree required. 5+ years of experience required. Benefits. Free lunch.",
+ "requirements": [
+  {
+   "requirement_id": "synthetic_demo_1:R001",
+   "category": "TOOL_TECHNOLOGY",
+   "value": "python",
+   "requirement_type": "REQUIRED",
+   "status": "FOUND_EXPLICIT",
+   "job_span": [
+    14,
+    20
+   ],
+   "cv_spans": [
+    [
+     58,
+     64,
+     "EXPLICIT"
+    ]
+   ]
+  },
+  {
+   "requirement_id": "synthetic_demo_1:R002",
+   "category": "TOOL_TECHNOLOGY",
+   "value": "sql",
+   "requirement_type": "REQUIRED",
+   "status": "FOUND_EXPLICIT",
+   "job_span": [
+    31,
+    34
+   ],
+   "cv_spans": [
+    [
+     66,
+     69,
+     "EXPLICIT"
+    ],
+    [
+     126,
+     129,
+     "EXPLICIT"
+    ]
+   ]
+  },
+  {
+   "requirement_id": "synthetic_demo_1:R003",
+   "category": "TOOL_TECHNOLOGY",
+   "value": "tableau",
+   "requirement_type": "PREFERRED",
+   "status": "FOUND_EXPLICIT_NEGATIVE",
+   "job_span": [
+    45,
+    52
+   ],
+   "cv_spans": [
+    [
+     162,
+     169,
+     "EXPLICIT_NEGATIVE"
+    ]
+   ]
+  },
+  {
+   "requirement_id": "synthetic_demo_1:R004",
+   "category": "TOOL_TECHNOLOGY",
+   "value": "docker",
+   "requirement_type": "PREFERRED",
+   "status": "FOUND_UNCLEAR",
+   "job_span": [
+    64,
+    70
+   ],
+   "cv_spans": [
+    [
+     194,
+     200,
+     "UNCLEAR"
+    ]
+   ]
+  },
+  {
+   "requirement_id": "synthetic_demo_1:R005",
+   "category": "TOOL_TECHNOLOGY",
+   "value": "kubernetes",
+   "requirement_type": "REQUIRED",
+   "status": "NOT_STATED_UNKNOWN",
+   "job_span": [
+    82,
+    92
+   ],
+   "cv_spans": []
+  },
+  {
+   "requirement_id": "synthetic_demo_1:R006",
+   "category": "EDUCATION",
+   "value": "BACHELOR",
+   "requirement_type": "REQUIRED",
+   "status": "LEVEL_MET",
+   "job_span": [
+    103,
+    120
+   ],
+   "cv_spans": [
+    [
+     213,
+     232,
+     "EXPLICIT"
+    ]
+   ]
+  },
+  {
+   "requirement_id": "synthetic_demo_1:R007",
+   "category": "EXPERIENCE",
+   "value": "5 years",
+   "requirement_type": "REQUIRED",
+   "status": "YEARS_STATED_NOT_COMPARED",
+   "job_span": [
+    131,
+    139
+   ],
+   "cv_spans": [
+    [
+     27,
+     48,
+     "EXPLICIT"
+    ]
+   ]
+  }
+ ],
+ "advice_only": true,
+ "prediction": {
+  "label": "Potential Fit",
+  "probabilities": {
+   "No Fit": 0.3,
+   "Potential Fit": 0.38,
+   "Good Fit": 0.32
+  },
+  "abstain": true
+ }
+}

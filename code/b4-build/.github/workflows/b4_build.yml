@@ -1,0 +1,49 @@
+name: b4-build
+concurrency:
+  group: b4-build
+  cancel-in-progress: true
+on:
+  workflow_dispatch:
+  push:
+    branches: [b4-build]
+    paths: ['b4/**', '.github/workflows/b4_build.yml']
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pinned HireMind-DL code and data loader
+        run: |
+          git clone -q https://github.com/Hams770/HireMind-DL.git _dl && git -C _dl checkout -q 1f22f34462c400f884bb0a00f061dbea0bd687d5
+      - name: Install
+        run: |
+          pip install pandas==2.2.3 scikit-learn==1.6.1 huggingface-hub==0.30.2 transformers==4.51.3 numpy scipy
+          pip freeze > pip_freeze.txt
+      - name: B4 build (offsets and counts only)
+        id: run
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p out
+          python b4/b4_build.py _dl out 2>&1 | tail -30 | cut -c1-200 | tee out/run_log_tail.txt
+      - name: Commit outputs
+        if: always()
+        shell: bash
+        run: |
+          [ -f out/evidence_inputs.jsonl ] && gzip -9 -f out/evidence_inputs.jsonl
+          mkdir -p b4_results/run_${{ github.run_id }} && cp -r out/* pip_freeze.txt b4_results/run_${{ github.run_id }}/ || true
+          du -sh b4_results
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git checkout -b b4-results-${{ github.run_id }}
+          git add -f b4_results && git commit -qm "B4 outputs ${{ github.run_id }} (no raw text)"
+          git push origin b4-results-${{ github.run_id }}
+      - name: Fail if the run failed
+        if: steps.run.outcome == 'failure'
+        run: exit 1

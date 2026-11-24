@@ -1,0 +1,30 @@
+  "input": "B4 lex_k selection (extractor v3.1) + Knowledge v1 line",
+  "epochs": 3,
+  "device": "cpu",
+  "best_step": 800,
+  "updates": 939,
+  "seconds": 441,
+  "accuracy": 59.29432013769363,
+  "macro_f1": 53.57943320011289,
+  "good_fit_recall": 50.865051903114185,
+  "good_fit_precision": 48.03921568627451,
+  "potential_fit_recall": 33.33333333333333,
+  "confusion": [
+    [
+      444,
+      51,
+      84
+    ],
+    [
+      121,
+      98,
+      75
+    ],
+    [
+      78,
+      64,
+      147
+    ]
+  ],
+  "torch": "2.15.0+cpu"
+}

@@ -1,0 +1,57 @@
+name: c-m5
+on:
+  workflow_dispatch:
+  push:
+    branches: [c-m5]
+    paths: ['phase_c2_m5/**', '.github/workflows/c_m5.yml']
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pinned HireMind-DL code and data loader
+        run: |
+          git clone -q https://github.com/Hams770/HireMind-DL.git _dl && git -C _dl checkout -q 1f22f34462c400f884bb0a00f061dbea0bd687d5
+      - name: Install (CPU torch)
+        run: |
+          pip install pandas==2.2.3 scikit-learn==1.6.1 huggingface-hub==0.30.2 transformers==4.51.3 numpy scipy
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip freeze > pip_freeze.txt
+      - name: Machine
+        run: free -g; nproc
+      - name: M5 DistilBERT (D0, validation only)
+        id: run
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p out
+          python phase_c2_m5/c_stage2_m5_distilbert.py _dl out 2>&1 | tee out/full_log.txt | tail -5
+      - name: Keep the weights as an Actions artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m5-distilbert-s42
+          path: out/*.pt
+          retention-days: 30
+          if-no-files-found: ignore
+      - name: Commit outputs (scores/IDs only)
+        if: always()
+        shell: bash
+        run: |
+          tail -40 out/full_log.txt | cut -c1-200 > out/run_log_tail.txt || true
+          rm -f out/full_log.txt out/*.pt
+          mkdir -p c5_results/run_${{ github.run_id }} && cp -r out/* pip_freeze.txt c5_results/run_${{ github.run_id }}/ || true
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git checkout -b c-m5-results-${{ github.run_id }}
+          git add -f c5_results && git commit -qm "C M5 outputs ${{ github.run_id }} (no raw text)"
+          git push origin c-m5-results-${{ github.run_id }}
+      - name: Fail if the run failed
+        if: steps.run.outcome == 'failure'
+        run: exit 1

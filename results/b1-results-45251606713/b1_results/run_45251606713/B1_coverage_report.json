@@ -1,0 +1,32 @@
+{
+ "schema_version": "structured-evidence-v3",
+ "pairs": 4993,
+ "records": 196289,
+ "pairs_with_no_job_requirement": 87,
+ "pairs_with_no_skill_requirement": 244,
+ "pairs_with_no_cv_evidence": 0,
+ "median_requirements_per_pair": 9,
+ "records_by_source_category_status": {
+  "CV|CERTIFICATION|EXPLICIT": 715,
+  "CV|EDUCATION|EXPLICIT": 4274,
+  "CV|EMPLOYMENT|EXPLICIT": 18290,
+  "CV|EXPERIENCE|EXPLICIT": 2086,
+  "CV|SKILL|EXPLICIT": 41040,
+  "CV|SKILL|EXPLICIT_NEGATIVE": 40,
+  "CV|TOOL_TECHNOLOGY|EXPLICIT": 80866,
+  "JOB_DESCRIPTION|CERTIFICATION|EXPLICIT": 1006,
+  "JOB_DESCRIPTION|EDUCATION|EXPLICIT": 3835,
+  "JOB_DESCRIPTION|EXPERIENCE|EXPLICIT": 5102,
+  "JOB_DESCRIPTION|SKILL|EXPLICIT": 17621,
+  "JOB_DESCRIPTION|SKILL|UNCLEAR": 80,
+  "JOB_DESCRIPTION|TOOL_TECHNOLOGY|EXPLICIT": 21334
+ },
+ "link_status_totals": {
+  "FOUND_EXPLICIT": 11642,
+  "LEVEL_BELOW_REQUIRED": 462,
+  "LEVEL_MET": 1653,
+  "NOT_STATED_UNKNOWN": 33269,
+  "YEARS_STATED_NOT_COMPARED": 1872
+ },
+ "note": "Rule-based extractor. Coverage numbers are NOT accuracy: extraction accuracy is measured in B2 against human annotation."
+}

@@ -1,0 +1,2 @@
+model,role,labels,max_len,train_rows,validation_rows,best_epoch,fit_seconds,inference_ms_per_pair,accuracy_pct,macro_f1_pct,no_fit_precision_pct,no_fit_recall_pct,no_fit_f1_pct,potential_fit_precision_pct,potential_fit_recall_pct,potential_fit_f1_pct,good_fit_precision_pct,good_fit_recall_pct,good_fit_f1_pct,confusion_true_rows_pred_cols
+M5_DistilBERT_s43_knowledge_D1,primary (single seed),"D1 TRAIN overlay, D0 validation",384,4993,1162,3,7037.2,104.36,51.2048,34.8823,54.262,90.1554,67.7482,32.8358,14.966,20.5607,43.9394,10.0346,16.338,"[[522,38,19],[232,44,18],[208,52,29]]"
