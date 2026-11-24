@@ -67,11 +67,13 @@ M5 + Knowledge + evidence (E2),D0,cpu,44,60.93,56.57,66.09,56.34,32.65,True,True
 M5 + Knowledge + evidence (E2),D0,cpu,45,51.55,41.22,18.69,51.43,26.87,False,False
 M5 + Knowledge + evidence (E2),D0,cpu,46,53.01,43.93,47.75,40.12,13.95,False,False
 M5 + Knowledge + evidence (E2),D0,cpu,47,53.27,47.4,57.09,39.95,22.11,False,False
+M5 + Knowledge + evidence (E2),D0,cpu,48,55.77,48.14,34.6,50.0,29.59,False,False
 M5 + Knowledge + evidence (E2),D0,cpu,49,56.02,45.37,33.22,49.74,18.71,False,False
 M5 + Knowledge + evidence (E2),D1,cpu,42,52.07,41.6,23.18,34.01,22.79,False,False
 M5 + Knowledge + evidence (E2),D1,cpu,43,53.79,45.95,42.91,42.91,20.75,False,False
 M5 + Knowledge + evidence (E2),D1,cpu,44,58.26,49.99,45.67,50.97,22.79,True,False
 M5 + Knowledge + evidence (E2),D1,cpu,45,51.72,39.35,23.53,42.24,14.29,False,False
+M5 + Knowledge + evidence (E2),D1,cpu,46,55.77,46.24,36.68,53.27,19.39,False,False
 M5 + Knowledge + evidence (E2),D1,cpu,47,53.18,47.24,51.56,39.73,23.81,False,False
 M5 + Knowledge + evidence (E2),D1,cpu,48,57.75,50.14,37.37,57.45,29.59,True,True
 M5 + Knowledge + evidence (E2),D1,cpu,49,56.02,48.98,49.13,42.39,24.15,False,False

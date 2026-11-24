@@ -20,8 +20,8 @@ All numbers are on the frozen VALIDATION split (1,162 pairs: 579 No Fit, 294 Pot
 | DistilBERT | M5 plain (CV, job) | D0 | 1 | 50.60 | 39.32 | 12.46 | 32.43 | 30.95 | no |
 | DistilBERT + Knowledge v1 | M5 + Knowledge (E0) | D0 | 4 | 50.30 ± 0.80 | 37.10 ± 3.20 | 17.65 ± 11.31 | 35.25 ± 8.13 | 16.92 ± 2.94 | no |
 | DistilBERT + Knowledge v1 | M5 + Knowledge (E1) | D1 | 4 | 50.77 ± 1.61 | 39.54 ± 6.43 | 20.33 ± 16.50 | 37.45 ± 6.16 | 24.74 ± 10.81 | no |
-| DistilBERT + Knowledge v1 | M5 + Knowledge + evidence (E2) | D0 | 7 | 53.80 ± 3.64 | 45.58 ± 5.31 | 41.23 ± 16.76 | 43.39 ± 9.21 | 22.25 ± 6.05 | no |
-| DistilBERT + Knowledge v1 | M5 + Knowledge + evidence (E2) | D1 | 7 | 54.68 ± 2.67 | 46.18 ± 4.22 | 39.05 ± 11.64 | 44.24 ± 7.68 | 22.59 ± 4.57 | no |
+| DistilBERT + Knowledge v1 | M5 + Knowledge + evidence (E2) | D0 | 8 | 54.04 ± 3.44 | 45.90 ± 5.00 | 40.40 ± 15.69 | 44.21 ± 8.84 | 23.17 ± 6.17 | no |
+| DistilBERT + Knowledge v1 | M5 + Knowledge + evidence (E2) | D1 | 8 | 54.82 ± 2.50 | 46.19 ± 3.91 | 38.75 ± 10.81 | 45.37 ± 7.79 | 22.19 ± 4.38 | no |
 | DistilBERT hybrid (M8, E5) | M8 full | D0 | 1 | 53.96 | 45.48 | 32.87 | 42.22 | 25.17 | no |
 | DistilBERT hybrid (M8, E5) | M8 minus_evidence | D0 | 1 | 52.32 | 42.95 | 24.22 | 45.16 | 26.19 | no |
 | DistilBERT hybrid (M8, E5) | M8 minus_knowledge | D0 | 1 | 53.01 | 44.59 | 38.41 | 36.75 | 20.41 | no |
@@ -45,8 +45,8 @@ All numbers are on the frozen VALIDATION split (1,162 pairs: 579 No Fit, 294 Pot
 | M5 plain (CV, job) | D0 | 61.5 / 79.6 / 69.4 | 30.2 / 31.0 / 30.6 | 32.4 / 12.5 / 18.0 |
 | M5 + Knowledge (E0) | D0 | 56.9 / 83.5 / 67.6 | 29.7 / 16.9 / 21.4 | 35.2 / 17.6 / 22.3 |
 | M5 + Knowledge (E1) | D1 | 59.9 / 79.2 / 67.3 | 31.9 / 24.7 / 27.2 | 37.4 / 20.3 / 24.1 |
-| M5 + Knowledge + evidence (E2) | D0 | 63.6 / 76.1 / 69.0 | 35.9 / 22.3 / 27.1 | 43.4 / 41.2 / 40.6 |
-| M5 + Knowledge + evidence (E2) | D1 | 64.2 / 78.8 / 70.6 | 34.8 / 22.6 / 27.3 | 44.2 / 39.1 / 40.7 |
+| M5 + Knowledge + evidence (E2) | D0 | 63.5 / 76.5 / 69.2 | 36.1 / 23.2 / 27.8 | 44.2 / 40.4 / 40.6 |
+| M5 + Knowledge + evidence (E2) | D1 | 63.8 / 79.4 / 70.6 | 34.7 / 22.2 / 27.0 | 45.4 / 38.8 / 41.0 |
 | M8 full | D0 | 64.8 / 79.1 / 71.2 | 32.2 / 25.2 / 28.2 | 42.2 / 32.9 / 37.0 |
 | M8 minus_evidence | D0 | 61.1 / 79.6 / 69.1 | 30.6 / 26.2 / 28.2 | 45.2 / 24.2 / 31.5 |
 | M8 minus_knowledge | D0 | 68.1 / 76.9 / 72.2 | 29.0 / 20.4 / 24.0 | 36.8 / 38.4 / 37.6 |
@@ -152,19 +152,19 @@ All numbers are on the frozen VALIDATION split (1,162 pairs: 579 No Fit, 294 Pot
 | Potential Fit | 177.8 | 72.8 | 43.5 |
 | Good Fit | 145.2 | 85.0 | 58.8 |
 
-**M5 + Knowledge + evidence (E2) (D0, 7 seeds)**  
+**M5 + Knowledge + evidence (E2) (D0, 8 seeds)**  
 | true \ predicted | No Fit | Potential Fit | Good Fit |
 |---|---|---|---|
-| No Fit | 440.6 | 46.0 | 92.4 |
-| Potential Fit | 158.9 | 65.4 | 69.7 |
-| Good Fit | 97.0 | 72.9 | 119.1 |
+| No Fit | 443.1 | 47.5 | 88.4 |
+| Potential Fit | 159.9 | 68.1 | 66.0 |
+| Good Fit | 97.5 | 74.8 | 116.8 |
 
-**M5 + Knowledge + evidence (E2) (D1, 7 seeds)**  
+**M5 + Knowledge + evidence (E2) (D1, 8 seeds)**  
 | true \ predicted | No Fit | Potential Fit | Good Fit |
 |---|---|---|---|
-| No Fit | 456.1 | 42.3 | 80.6 |
-| Potential Fit | 163.3 | 66.4 | 64.3 |
-| Good Fit | 93.1 | 83.0 | 112.9 |
+| No Fit | 459.8 | 42.2 | 77.0 |
+| Potential Fit | 167.4 | 65.2 | 61.4 |
+| Good Fit | 96.0 | 81.0 | 112.0 |
 
 **M8 full (D0, 1 seed)**  
 | true \ predicted | No Fit | Potential Fit | Good Fit |
@@ -208,7 +208,7 @@ M8 minus_evidence did not complete on the GPU (all three seeds stopped at start-
 
 ## 3c. Single runs that pass the rule, and the closest setting
 
-Out of 89 individual runs (every seed of every model), **5 single runs pass the full selection rule** on their own, and 5 more beat the baseline on accuracy and Good Fit recall but drop more than 2 points on one guard metric. The full list is in D_experiments/ALL_RUNS_per_seed_validation.csv.
+Out of 91 individual runs (every seed of every model), **5 single runs pass the full selection rule** on their own, and 5 more beat the baseline on accuracy and Good Fit recall but drop more than 2 points on one guard metric. The full list is in D_experiments/ALL_RUNS_per_seed_validation.csv.
 
 | Run | Seed | Accuracy | Macro-F1 | Good Fit recall | Good Fit precision | Potential recall |
 |---|---|---|---|---|---|---|
@@ -233,4 +233,4 @@ Out of 89 individual runs (every seed of every model), **5 single runs pass the 
 - **M8 more seeds, Colab GPU (separate setting, 24 Nov).** The M8 variants were re-run on a Colab GPU with the same script, seeds 43–45, D0 (mean ± SD over 3 seeds): full accuracy 53.07, Good Fit recall 28.14 ± 14.6; minus_knowledge 54.10, Good Fit recall 44.64 ± 5.0; minus_struct 52.93, Good Fit recall 27.68 ± 7.6. None reaches the baseline accuracy (56.79). The single-seed CPU result of minus_struct (seed 42, Good Fit recall 48.79) did not repeat on other seeds, so the seed-42 M8 rows above should not be read as stable.
 - M4 E1 and M4 + evidence (E2) on D1 show the same mean Good Fit recall (24.91) by coincidence: the per-seed counts differ (E1: 74, 93, 59, 77, 58, 90, 52, 73; E2: 74, 80, 63, 60, 82, 91, 59, 67) but both sum to 576 of 8 × 289.
 - Per-job-group error analysis of the frozen model: D_error_analysis/ (error_pretags_by_job_group.csv).
-- Runs not included: two more DistilBERT + Knowledge + evidence seeds (seed 48 on D0, seed 46 on D1) were still running at submission time; a 3- vs 5-epoch test of the same DistilBERT setting on a Colab GPU (seeds 42–44) finished, but its summary table was not exported to the project drive at submission time, so it is not used for any conclusion here. Its per-epoch log for seed 44 shows the same pattern as on CPU (seed 44 strongest: up to 61.10 accuracy and 66.44 Good Fit recall).
+- Runs not included: a 3- vs 5-epoch test of the same DistilBERT setting on a Colab GPU (seeds 42–44) finished, but its summary table was not exported to the project drive at submission time, so it is not used for any conclusion here. Its per-epoch log for seed 44 shows the same pattern as on CPU (seed 44 strongest: up to 61.10 accuracy and 66.44 Good Fit recall).

@@ -6,10 +6,10 @@ Senior project, Effat University · 24 November 2026 · All results on the froze
 The plan asked which of three factors (labels, evidence representation, classifier) explains the weak Good Fit detection, and whether a model can beat the baseline (BERT-Tiny + Knowledge v1, 8 seeds: accuracy 56.79 ± 1.17, Good Fit recall 36.72 ± 11.28) on accuracy and Good Fit recall together.
 
 - **Main cause found: the model does not see the evidence.** 99.6% of CV–job pairs exceed the input limit and plain truncation keeps only about a third of the relevant evidence. Evidence-aware selection keeps about 80–90%.
-- **Evidence representation is the strongest factor.** It raises Good Fit recall for both encoders (BERT-Tiny 41.52 ± 12.39 vs 36.72 ± 11.28; DistilBERT + Knowledge 41.23 ± 16.76 with evidence vs 17.65 ± 11.31 without).
+- **Evidence representation is the strongest factor.** It raises Good Fit recall for both encoders (BERT-Tiny 41.52 ± 12.39 vs 36.72 ± 11.28; DistilBERT + Knowledge 40.40 ± 15.69 with evidence vs 17.65 ± 11.31 without).
 - **Labels shift the class boundary rather than improve the model.** The reviewed labels (D1, 255 approved corrections) lower BERT-Tiny Good Fit recall by about 12 points (statistically clear) while raising Good Fit precision and Potential Fit recall.
 - **The classifier alone does not help.** DistilBERT without evidence is worse than BERT-Tiny and is unstable across seeds.
-- **No setting meets the preset rule on average; the frozen baseline stays.** No setting beats the baseline **on average**. But **5 single runs do pass the rule** (three seeds of BERT-Tiny + Knowledge + evidence, two of DistilBERT + Knowledge + evidence, the best reaching accuracy 60.93 and Good Fit recall 66.09), and the closest setting on average, BERT-Tiny + Knowledge + evidence, raises Good Fit recall by 4.8 points with every guard kept and misses only on accuracy, by 0.49 points (less than the seed SD). It is the first candidate to confirm on new data.
+- **No setting meets the preset rule on average; the frozen baseline stays.** But **5 single runs do pass the rule** (three seeds of BERT-Tiny + Knowledge + evidence, two of DistilBERT + Knowledge + evidence, the best reaching accuracy 60.93 and Good Fit recall 66.09), and the closest setting on average, BERT-Tiny + Knowledge + evidence, raises Good Fit recall by 4.8 points with every guard kept and misses only on accuracy, by 0.49 points (less than the seed SD). It is the first candidate to confirm on new data.
 - The frozen model is served by the platform through a tested patch, and HR stays in control: advice only, evidence shown for every requirement, and a review flag that catches 54% of Good Fit pairs.
 
 ## 2. Problem and starting point
@@ -72,8 +72,8 @@ All numbers on validation; mean ± SD over seeds (one seed has no SD). Full clas
 | M5 plain (CV, job) | D0 | 1 | 50.60 | 39.32 | 12.46 | 32.43 | 30.95 | no |
 | M5 + Knowledge (E0) | D0 | 4 | 50.30 ± 0.80 | 37.10 ± 3.20 | 17.65 ± 11.31 | 35.25 ± 8.13 | 16.92 ± 2.94 | no |
 | M5 + Knowledge (E1) | D1 | 4 | 50.77 ± 1.61 | 39.54 ± 6.43 | 20.33 ± 16.50 | 37.45 ± 6.16 | 24.74 ± 10.81 | no |
-| M5 + Knowledge + evidence (E2) | D0 | 7 | 53.80 ± 3.64 | 45.58 ± 5.31 | 41.23 ± 16.76 | 43.39 ± 9.21 | 22.25 ± 6.05 | no |
-| M5 + Knowledge + evidence (E2) | D1 | 7 | 54.68 ± 2.67 | 46.18 ± 4.22 | 39.05 ± 11.64 | 44.24 ± 7.68 | 22.59 ± 4.57 | no |
+| M5 + Knowledge + evidence (E2) | D0 | 8 | 54.04 ± 3.44 | 45.90 ± 5.00 | 40.40 ± 15.69 | 44.21 ± 8.84 | 23.17 ± 6.17 | no |
+| M5 + Knowledge + evidence (E2) | D1 | 8 | 54.82 ± 2.50 | 46.19 ± 3.91 | 38.75 ± 10.81 | 45.37 ± 7.79 | 22.19 ± 4.38 | no |
 | M8 full | D0 | 1 | 53.96 | 45.48 | 32.87 | 42.22 | 25.17 | no |
 | M8 minus_evidence | D0 | 1 | 52.32 | 42.95 | 24.22 | 45.16 | 26.19 | no |
 | M8 minus_knowledge | D0 | 1 | 53.01 | 44.59 | 38.41 | 36.75 | 20.41 | no |
@@ -85,7 +85,7 @@ All numbers on validation; mean ± SD over seeds (one seed has no SD). Full clas
 **Error analysis (M4, 8 seeds).** 476 of 1,162 validation pairs are wrong in most seeds. Potential Fit (70%) and Good Fit (62%) are missed most; mistakes are somewhat more often pairs with ambiguous requirements (+10.5 points). Five job groups hold 30% of the consistent mistakes.
 
 ### Single runs that pass the rule, and the closest setting
-Out of 89 individual runs (every seed of every model), **5 single runs pass the full selection rule** on their own, and 5 more beat the baseline on accuracy and Good Fit recall but drop more than 2 points on one guard metric. The full list is in D_experiments/ALL_RUNS_per_seed_validation.csv.
+Out of 91 individual runs (every seed of every model), **5 single runs pass the full selection rule** on their own, and 5 more beat the baseline on accuracy and Good Fit recall but drop more than 2 points on one guard metric. The full list is in D_experiments/ALL_RUNS_per_seed_validation.csv.
 
 | Run | Seed | Accuracy | Macro-F1 | Good Fit recall | Good Fit precision | Potential recall |
 |---|---|---|---|---|---|---|
@@ -112,14 +112,14 @@ To answer the plan's classifier question fairly, DistilBERT received exactly the
 | BERT-Tiny + Knowledge + evidence, D1 (E2) | 8 | 56.12 ± 1.13 | 47.58 ± 1.83 | 24.91 ± 4.03 | 50.96 ± 6.50 | 38.27 ± 8.27 |
 | DistilBERT + Knowledge, D0 (E0) | 4 | 50.30 ± 0.80 | 37.10 ± 3.20 | 17.65 ± 11.31 | 35.25 ± 8.13 | 16.92 ± 2.94 |
 | DistilBERT + Knowledge, D1 (E1) | 4 | 50.77 ± 1.61 | 39.54 ± 6.43 | 20.33 ± 16.50 | 37.45 ± 6.16 | 24.74 ± 10.81 |
-| DistilBERT + Knowledge + evidence, D0 (E2) | 7 | 53.80 ± 3.64 | 45.58 ± 5.31 | 41.23 ± 16.76 | 43.39 ± 9.21 | 22.25 ± 6.05 |
-| DistilBERT + Knowledge + evidence, D1 (E2) | 7 | 54.68 ± 2.67 | 46.18 ± 4.22 | 39.05 ± 11.64 | 44.24 ± 7.68 | 22.59 ± 4.57 |
+| DistilBERT + Knowledge + evidence, D0 (E2) | 8 | 54.04 ± 3.44 | 45.90 ± 5.00 | 40.40 ± 15.69 | 44.21 ± 8.84 | 23.17 ± 6.17 |
+| DistilBERT + Knowledge + evidence, D1 (E2) | 8 | 54.82 ± 2.50 | 46.19 ± 3.91 | 38.75 ± 10.81 | 45.37 ± 7.79 | 22.19 ± 4.38 |
 
-- **Evidence is what DistilBERT needs.** Without evidence selection DistilBERT + Knowledge stays far below BERT-Tiny (Good Fit recall 17.65 ± 11.31 on D0); with it, Good Fit recall rises to 41.23 ± 16.76 (D0) and 39.05 ± 11.64 (D1). The text the model sees matters more than the size of the model.
-- **The label effect depends on the model.** For BERT-Tiny, D1 lowers Good Fit recall by about 12 points; for DistilBERT with evidence, D0 and D1 give almost the same means (41.23 and 39.05 Good Fit recall, 7 seeds each). The reviewed labels therefore do not hurt every model; they mainly move where BERT-Tiny draws the Good Fit boundary.
+- **Evidence is what DistilBERT needs.** Without evidence selection DistilBERT + Knowledge stays far below BERT-Tiny (Good Fit recall 17.65 ± 11.31 on D0); with it, Good Fit recall rises to 40.40 ± 15.69 (D0) and 38.75 ± 10.81 (D1). The text the model sees matters more than the size of the model.
+- **The label effect depends on the model.** For BERT-Tiny, D1 lowers Good Fit recall by about 12 points; for DistilBERT with evidence, D0 and D1 give almost the same means (40.40 and 38.75 Good Fit recall, 8 seeds each). The reviewed labels therefore do not hurt every model; they mainly move where BERT-Tiny draws the Good Fit boundary.
 - **Results vary strongly between seeds** for DistilBERT with evidence (single seeds ranged from about 19 to 66 Good Fit recall on D0), so only the means are interpreted, and the number of seeds behind each mean is shown.
 - **The Knowledge line explains why BERT-Tiny was already strong:** it is computed from the full texts before truncation, so it carries part of the evidence that the 512-token cut removes.
-- **The best single run, and why it is not selected.** DistilBERT + Knowledge + evidence on D0, seed 44, reached accuracy 60.93, macro-F1 56.57, Good Fit recall 66.09, Good Fit precision 56.34 and Potential recall 32.65: on its own it is better than the baseline on every metric. It is not selected because it is the luckiest of seven seeds of the same setting, all scored on the same validation set (the other six reached Good Fit recall 18.7–57.1). Picking the best seed after seeing validation results overstates what the setting delivers; the fixed rule compares means over seeds, and no unused test set is left to confirm a single run. The weights of that run were not kept (the run saved only metrics and predictions). It is reported as the strongest sign that evidence-aware DistilBERT can work, and as the first thing to confirm with more data or a fresh test set.
+- **The best single run, and why it is not selected.** DistilBERT + Knowledge + evidence on D0, seed 44, reached accuracy 60.93, macro-F1 56.57, Good Fit recall 66.09, Good Fit precision 56.34 and Potential recall 32.65: on its own it is better than the baseline on every metric. It is not selected because it is the luckiest of eight seeds of the same setting, all scored on the same validation set (the other seven reached Good Fit recall 18.7–57.1). Picking the best seed after seeing validation results overstates what the setting delivers; the fixed rule compares means over seeds, and no unused test set is left to confirm a single run. The weights of that run were not kept (the run saved only metrics and predictions). It is reported as the strongest sign that evidence-aware DistilBERT can work, and as the first thing to confirm with more data or a fresh test set.
 - **Adding more inputs on top of evidence does not help DistilBERT.** The M8 hybrid (evidence + Knowledge + structured features) and its ablations were re-run on seeds 43–45 (Colab GPU, a separate setting): full 53.07 accuracy / 28.14 ± 14.6 Good Fit recall, without Knowledge 54.10 / 44.64 ± 5.0, without structured features 52.93 / 27.68 ± 7.6. No variant reaches the baseline accuracy, and the strong single-seed result of one variant (seed 42) did not repeat.
 
 

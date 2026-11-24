@@ -16,7 +16,7 @@ SEEDS = {("M5 + Knowledge + evidence (E2)", "D0"): [42, 43, 44, 45, 46, 47, 49],
          ("M5 + Knowledge + evidence (E2)", "D1"): [42, 43, 44, 45, 47, 48, 49]}
 rows = []
 for grp, name, lab, dev, cms, note in MODELS:
-    seeds = SEEDS.get((name, lab)) or (list(range(42, 42 + len(cms))) if len(cms) > 1 else [42])
+    seeds = SEEDS.get((name, lab)) if len(SEEDS.get((name, lab), [])) == len(cms) else (list(range(42, 42 + len(cms))) if len(cms) > 1 else [42])
     assert len(seeds) == len(cms), (name, lab)
     for s, cm in zip(seeds, cms):
         m = metrics(cm)
