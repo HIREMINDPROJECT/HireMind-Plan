@@ -27,6 +27,11 @@ if gpu.exists():
     for _, r in pd.read_csv(gpu).iterrows():
         rows.append(dict(model=f"M8 {r.variant}", labels="D0", device="colab-gpu", seed=int(r.seed), accuracy=r.accuracy, macro_f1=r.macro_f1,
                          good_fit_recall=r.good_fit_recall, good_fit_precision=r.good_fit_precision, potential_recall=r.potential_fit_recall))
+ep = pkg / "D_experiments/DistilBERT_epochs_gpu_all_runs.csv"
+if ep.exists():
+    for _, r in pd.read_csv(ep).iterrows():
+        rows.append(dict(model=f"DistilBERT + Knowledge + evidence, {int(r.epochs)} epochs", labels="D0", device="colab-gpu", seed=int(r.seed), accuracy=r.accuracy,
+                         macro_f1=r.macro_f1, good_fit_recall=r.good_fit_recall, good_fit_precision=r.good_fit_precision, potential_recall=r.potential_recall))
 d = pd.DataFrame(rows)
 d["beats_acc_and_gf_recall"] = (d.accuracy > B["acc"]) & (d.good_fit_recall > B["gfr"])
 d["passes_full_rule"] = d.beats_acc_and_gf_recall & (d.good_fit_precision >= B["gfp"] - 2) & (d.macro_f1 >= B["mf1"] - 2) & (d.potential_recall >= B["pr"] - 2)
@@ -44,6 +49,12 @@ t += [f"| {nice(r)} | {r.seed} | {r.accuracy:.2f} | {r.macro_f1:.2f} | {r.good_f
 e2 = d[(d.model == "M4 + evidence (E2)") & (d.labels == "D0")]
 e0 = d[(d.model == "M4 E0") & (d.labels == "D0")]
 pair = e2.set_index("seed").good_fit_recall - e0.set_index("seed").good_fit_recall
+g5 = d[d.model == "DistilBERT + Knowledge + evidence, 5 epochs"]
+ep_text = ""
+if len(g5):
+    ep_text = (f"\n- **DistilBERT + Knowledge + evidence trained for 5 epochs (Colab GPU, {len(g5)} seeds)** is the other near miss on average: accuracy {g5.accuracy.mean():.2f}, "
+               f"Good Fit recall {g5.good_fit_recall.mean():.2f}, Good Fit precision {g5.good_fit_precision.mean():.2f} and macro-F1 {g5.macro_f1.mean():.2f} are all above the baseline, "
+               f"but Potential recall falls to {g5.potential_recall.mean():.2f}, more than 2 points below {B['pr']}, so it fails the rule. With only {len(g5)} seeds on a different device it is a lead to repeat with more seeds, not a result.")
 s46 = e2[e2.seed == 46].iloc[0]; f46 = e0[e0.seed == 46].iloc[0]
 text = f"""### Single runs that pass the rule, and the closest setting
 Out of {len(d)} individual runs (every seed of every model), **{len(P)} single runs pass the full selection rule** on their own, and {len(N)} more beat the baseline on accuracy and Good Fit recall but drop more than 2 points on one guard metric. The full list is in D_experiments/ALL_RUNS_per_seed_validation.csv.
@@ -51,9 +62,9 @@ Out of {len(d)} individual runs (every seed of every model), **{len(P)} single r
 {chr(10).join(t)}
 
 - **Why a single run is not enough.** The rule compares the mean of a setting with the baseline mean, because seeds move results a lot: {len(own)} of the baseline's own 8 seeds also beat its mean on accuracy and Good Fit recall (seeds {', '.join(str(s) for s in own.seed)}). Picking the best seed after seeing validation results would overstate what a setting delivers, and no unused test set is left to confirm a single run.
-- **The closest setting on average is BERT-Tiny + Knowledge + evidence (D0).** It keeps every guard (Good Fit precision, macro-F1 and Potential recall all within 2 points), raises Good Fit recall by {e2.good_fit_recall.mean() - B['gfr']:.2f} points, and misses only on accuracy, by {B['acc'] - e2.accuracy.mean():.2f} points, less than the seed-to-seed SD of the baseline (1.17). Compared seed by seed, it has higher Good Fit recall on {int((pair > 0).sum())} of 8 seeds. Three of its eight seeds pass the rule on their own.
+- **The closest setting on average is BERT-Tiny + Knowledge + evidence (D0).** It keeps every guard (Good Fit precision, macro-F1 and Potential recall all within 2 points), raises Good Fit recall by {e2.good_fit_recall.mean() - B['gfr']:.2f} points, and misses only on accuracy, by {B['acc'] - e2.accuracy.mean():.2f} points, less than the seed-to-seed SD of the baseline (1.17). Compared seed by seed, it has higher Good Fit recall on {int((pair > 0).sum())} of 8 seeds. Three of its eight seeds pass the rule on their own.{ep_text}
 - **On the frozen seed itself (46),** which was chosen as the seed closest to the baseline mean and not from the evidence results, adding evidence gives accuracy {s46.accuracy:.2f} vs {f46.accuracy:.2f}, Good Fit recall {s46.good_fit_recall:.2f} vs {f46.good_fit_recall:.2f}, Good Fit precision {s46.good_fit_precision:.2f} vs {f46.good_fit_precision:.2f} and Potential recall {s46.potential_recall:.2f} vs {f46.potential_recall:.2f}: better on every metric.
-- **Recommendation:** keep the frozen baseline as the rule requires, and treat BERT-Tiny + Knowledge + evidence as the first candidate to confirm on new data or a fresh test set; DistilBERT + Knowledge + evidence (seed 44: Good Fit recall 66.09) is the second.
+- **Recommendation:** keep the frozen baseline as the rule requires, and treat BERT-Tiny + Knowledge + evidence as the first candidate to confirm on new data or a fresh test set; DistilBERT + Knowledge + evidence (seed 44: Good Fit recall about 66 on CPU and on GPU), preferably trained for 5 epochs, is the second.
 """
 (here / "runs_section.md").write_text(text)
 print(f"{len(d)} runs; pass full rule: {len(P)}; near: {len(N)}")

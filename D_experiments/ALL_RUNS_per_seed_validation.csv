@@ -90,3 +90,9 @@ M8 full,D0,colab-gpu,45,52.07,40.65,15.22,51.76,27.89,False,False
 M8 minus_knowledge,D0,colab-gpu,43,56.88,48.98,46.02,50.38,22.11,True,False
 M8 minus_knowledge,D0,colab-gpu,44,51.03,44.32,48.79,37.5,19.05,False,False
 M8 minus_knowledge,D0,colab-gpu,45,54.39,44.13,39.1,41.09,15.31,False,False
+"DistilBERT + Knowledge + evidence, 3 epochs",D0,colab-gpu,42,53.7,46.0,49.83,40.68,18.37,False,False
+"DistilBERT + Knowledge + evidence, 3 epochs",D0,colab-gpu,43,51.2,42.18,31.83,32.74,20.07,False,False
+"DistilBERT + Knowledge + evidence, 3 epochs",D0,colab-gpu,44,59.38,52.44,66.09,49.35,21.09,True,False
+"DistilBERT + Knowledge + evidence, 5 epochs",D0,colab-gpu,42,55.16,46.46,50.52,42.82,16.33,False,False
+"DistilBERT + Knowledge + evidence, 5 epochs",D0,colab-gpu,43,56.45,47.56,43.6,44.84,20.07,False,False
+"DistilBERT + Knowledge + evidence, 5 epochs",D0,colab-gpu,44,59.55,55.64,66.44,51.2,34.35,True,True

@@ -1,0 +1,3 @@
+epochs,seeds,n,accuracy,macro_f1,good_fit_recall,good_fit_precision,potential_recall,beats_acc_and_gf_recall,passes_full_rule,confusion_matrix_rows_true_no_potential_good
+3,"42,43,44",1162,57.4,49.03,52.94,46.22,18.71,True,False,"[[459, 22, 98], [159, 55, 80], [92, 44, 153]]"
+5,"42,43,44",1162,60.15,51.83,58.13,51.69,19.39,True,False,"[[474, 28, 77], [157, 57, 80], [92, 29, 168]]"

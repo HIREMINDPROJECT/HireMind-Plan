@@ -203,17 +203,20 @@ Same scripts and inputs, run on a Colab T4 GPU. GPU results can differ slightly 
 | M8 minus_struct (hybrid) | D0 | 3 (43, 44, 45) | 52.93 ± 0.82 | 42.98 ± 1.57 | 27.68 ± 7.64 | 39.28 ± 3.05 | 22.34 ± 2.32 | no |
 | M8 full (hybrid) | D0 | 3 (43, 44, 45) | 53.07 ± 2.04 | 43.20 ± 3.22 | 28.14 ± 14.58 | 43.86 ± 8.37 | 23.70 ± 4.25 | no |
 | M8 minus_knowledge (hybrid) | D0 | 3 (43, 44, 45) | 54.10 ± 2.94 | 45.81 ± 2.75 | 44.64 ± 4.99 | 42.99 ± 6.65 | 18.82 ± 3.41 | no |
+| M5 + Knowledge + evidence, 3 epochs | D0 | 3 (42, 43, 44) | 54.76 ± 4.19 | 46.87 ± 5.19 | 49.25 ± 17.14 | 40.92 ± 8.31 | 19.84 ± 1.37 | no |
+| M5 + Knowledge + evidence, 5 epochs | D0 | 3 (42, 43, 44) | 57.05 ± 2.26 | 49.89 ± 5.01 | 53.52 ± 11.71 | 46.29 ± 4.37 | 23.58 ± 9.51 | no |
 
 M8 minus_evidence did not complete on the GPU (all three seeds stopped at start-up without a result); its only result is the CPU seed 42 row in section 1.
 
 ## 3c. Single runs that pass the rule, and the closest setting
 
-Out of 91 individual runs (every seed of every model), **5 single runs pass the full selection rule** on their own, and 5 more beat the baseline on accuracy and Good Fit recall but drop more than 2 points on one guard metric. The full list is in D_experiments/ALL_RUNS_per_seed_validation.csv.
+Out of 97 individual runs (every seed of every model), **6 single runs pass the full selection rule** on their own, and 6 more beat the baseline on accuracy and Good Fit recall but drop more than 2 points on one guard metric. The full list is in D_experiments/ALL_RUNS_per_seed_validation.csv.
 
 | Run | Seed | Accuracy | Macro-F1 | Good Fit recall | Good Fit precision | Potential recall |
 |---|---|---|---|---|---|---|
 | *Baseline: BERT-Tiny + Knowledge, D0, mean of 8 seeds* | — | 56.79 | 48.61 | 36.72 | 43.68 | 29.68 |
 | DistilBERT + Knowledge + evidence, D0 | 44 | 60.93 | 56.57 | 66.09 | 56.34 | 32.65 |
+| DistilBERT + Knowledge + evidence, 5 epochs, D0, GPU | 44 | 59.55 | 55.64 | 66.44 | 51.20 | 34.35 |
 | BERT-Tiny + Knowledge + evidence, D0 | 46 | 59.29 | 53.58 | 50.87 | 48.04 | 33.33 |
 | DistilBERT + Knowledge + evidence, D1 | 48 | 57.75 | 50.14 | 37.37 | 57.45 | 29.59 |
 | BERT-Tiny + Knowledge + evidence, D0 | 47 | 57.40 | 52.52 | 66.44 | 45.07 | 27.89 |
@@ -221,8 +224,9 @@ Out of 91 individual runs (every seed of every model), **5 single runs pass the 
 
 - **Why a single run is not enough.** The rule compares the mean of a setting with the baseline mean, because seeds move results a lot: 3 of the baseline's own 8 seeds also beat its mean on accuracy and Good Fit recall (seeds 43, 46, 49). Picking the best seed after seeing validation results would overstate what a setting delivers, and no unused test set is left to confirm a single run.
 - **The closest setting on average is BERT-Tiny + Knowledge + evidence (D0).** It keeps every guard (Good Fit precision, macro-F1 and Potential recall all within 2 points), raises Good Fit recall by 4.80 points, and misses only on accuracy, by 0.49 points, less than the seed-to-seed SD of the baseline (1.17). Compared seed by seed, it has higher Good Fit recall on 6 of 8 seeds. Three of its eight seeds pass the rule on their own.
+- **DistilBERT + Knowledge + evidence trained for 5 epochs (Colab GPU, 3 seeds)** is the other near miss on average: accuracy 57.05, Good Fit recall 53.52, Good Fit precision 46.29 and macro-F1 49.89 are all above the baseline, but Potential recall falls to 23.58, more than 2 points below 29.68, so it fails the rule. With only 3 seeds on a different device it is a lead to repeat with more seeds, not a result.
 - **On the frozen seed itself (46),** which was chosen as the seed closest to the baseline mean and not from the evidence results, adding evidence gives accuracy 59.29 vs 56.97, Good Fit recall 50.87 vs 38.41, Good Fit precision 48.04 vs 43.87 and Potential recall 33.33 vs 27.21: better on every metric.
-- **Recommendation:** keep the frozen baseline as the rule requires, and treat BERT-Tiny + Knowledge + evidence as the first candidate to confirm on new data or a fresh test set; DistilBERT + Knowledge + evidence (seed 44: Good Fit recall 66.09) is the second.
+- **Recommendation:** keep the frozen baseline as the rule requires, and treat BERT-Tiny + Knowledge + evidence as the first candidate to confirm on new data or a fresh test set; DistilBERT + Knowledge + evidence (seed 44: Good Fit recall about 66 on CPU and on GPU), preferably trained for 5 epochs, is the second.
 
 ## 4. Notes
 
@@ -233,4 +237,4 @@ Out of 91 individual runs (every seed of every model), **5 single runs pass the 
 - **M8 more seeds, Colab GPU (separate setting, 24 Nov).** The M8 variants were re-run on a Colab GPU with the same script, seeds 43–45, D0 (mean ± SD over 3 seeds): full accuracy 53.07, Good Fit recall 28.14 ± 14.6; minus_knowledge 54.10, Good Fit recall 44.64 ± 5.0; minus_struct 52.93, Good Fit recall 27.68 ± 7.6. None reaches the baseline accuracy (56.79). The single-seed CPU result of minus_struct (seed 42, Good Fit recall 48.79) did not repeat on other seeds, so the seed-42 M8 rows above should not be read as stable.
 - M4 E1 and M4 + evidence (E2) on D1 show the same mean Good Fit recall (24.91) by coincidence: the per-seed counts differ (E1: 74, 93, 59, 77, 58, 90, 52, 73; E2: 74, 80, 63, 60, 82, 91, 59, 67) but both sum to 576 of 8 × 289.
 - Per-job-group error analysis of the frozen model: D_error_analysis/ (error_pretags_by_job_group.csv).
-- Runs not included: a 3- vs 5-epoch test of the same DistilBERT setting on a Colab GPU (seeds 42–44) finished, but its summary table was not exported to the project drive at submission time, so it is not used for any conclusion here. Its per-epoch log for seed 44 shows the same pattern as on CPU (seed 44 strongest: up to 61.10 accuracy and 66.44 Good Fit recall).
+- 3- vs 5-epoch test (section 3b, Colab GPU, seeds 42–44): per-run results in D_experiments/DistilBERT_epochs_gpu_all_runs.csv and the 3-seed ensembles in D_experiments/DistilBERT_epochs_gpu_ensemble.csv. The 5-epoch mean beats the baseline on accuracy and Good Fit recall but fails the Potential recall guard; the 5-epoch ensemble (accuracy 60.15, Good Fit recall 58.13, Potential recall 19.39) fails the same guard.

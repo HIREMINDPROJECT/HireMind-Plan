@@ -29,7 +29,7 @@ To answer the plan's classifier question fairly, DistilBERT received exactly the
 - **The label effect depends on the model.** For BERT-Tiny, D1 lowers Good Fit recall by about 12 points; for DistilBERT with evidence, D0 and D1 give almost the same means (40.40 and 38.75 Good Fit recall, 8 seeds each). The reviewed labels therefore do not hurt every model; they mainly move where BERT-Tiny draws the Good Fit boundary.
 - **Results vary strongly between seeds** for DistilBERT with evidence (single seeds ranged from about 19 to 66 Good Fit recall on D0), so only the means are interpreted, and the number of seeds behind each mean is shown.
 - **The Knowledge line explains why BERT-Tiny was already strong:** it is computed from the full texts before truncation, so it carries part of the evidence that the 512-token cut removes.
-- **The best single run, and why it is not selected.** DistilBERT + Knowledge + evidence on D0, seed 44, reached accuracy 60.93, macro-F1 56.57, Good Fit recall 66.09, Good Fit precision 56.34 and Potential recall 32.65: on its own it is better than the baseline on every metric. It is not selected because it is the luckiest of eight seeds of the same setting, all scored on the same validation set (the other seven reached Good Fit recall 18.7–57.1). Picking the best seed after seeing validation results overstates what the setting delivers; the fixed rule compares means over seeds, and no unused test set is left to confirm a single run. The weights of that run were not kept (the run saved only metrics and predictions). It is reported as the strongest sign that evidence-aware DistilBERT can work, and as the first thing to confirm with more data or a fresh test set.
+- **The best single run is not selected.** Seed 44 on D0 (accuracy 60.93, Good Fit recall 66.09) is better than the baseline on every metric, but it is the best of eight seeds of the same setting (the other seven reached Good Fit recall 18.7–57.1), all scored on the same validation set, and no unused test set is left to confirm it. Its weights were not kept (the run saved only metrics and predictions).
 - **Adding more inputs on top of evidence does not help DistilBERT.** The M8 hybrid (evidence + Knowledge + structured features) and its ablations were re-run on seeds 43–45 (Colab GPU, a separate setting): full 53.07 accuracy / 28.14 ± 14.6 Good Fit recall, without Knowledge 54.10 / 44.64 ± 5.0, without structured features 52.93 / 27.68 ± 7.6. No variant reaches the baseline accuracy, and the strong single-seed result of one variant (seed 42) did not repeat.
 """
 summary = f"""The plan asked which of three factors (labels, evidence representation, classifier) explains the weak Good Fit detection, and whether a model can beat the baseline (BERT-Tiny + Knowledge v1, 8 seeds: accuracy {M4['acc']}, Good Fit recall {M4['gfr']}) on accuracy and Good Fit recall together.
@@ -38,7 +38,7 @@ summary = f"""The plan asked which of three factors (labels, evidence representa
 - **Evidence representation is the strongest factor.** It raises Good Fit recall for both encoders (BERT-Tiny {E2['gfr']} vs {M4['gfr']}; DistilBERT + Knowledge {e0['gfr']} with evidence vs {k0['gfr']} without).
 - **Labels shift the class boundary rather than improve the model.** The reviewed labels (D1, 255 approved corrections) lower BERT-Tiny Good Fit recall by about 12 points (statistically clear) while raising Good Fit precision and Potential Fit recall.
 - **The classifier alone does not help.** DistilBERT without evidence is worse than BERT-Tiny and is unstable across seeds.
-- {verdict} But **5 single runs do pass the rule** (three seeds of BERT-Tiny + Knowledge + evidence, two of DistilBERT + Knowledge + evidence, the best reaching accuracy 60.93 and Good Fit recall 66.09), and the closest setting on average, BERT-Tiny + Knowledge + evidence, raises Good Fit recall by 4.8 points with every guard kept and misses only on accuracy, by 0.49 points (less than the seed SD). It is the first candidate to confirm on new data.
+- {verdict} But **6 single runs do pass the rule** (three seeds of BERT-Tiny + Knowledge + evidence and three of DistilBERT + Knowledge + evidence, the best reaching accuracy 60.93 and Good Fit recall 66.09), and the closest setting on average, BERT-Tiny + Knowledge + evidence, raises Good Fit recall by 4.8 points with every guard kept and misses only on accuracy, by 0.49 points (less than the seed SD). It is the first candidate to confirm on new data. DistilBERT + Knowledge + evidence trained for 5 epochs (3 seeds, GPU) beats the baseline on accuracy and Good Fit recall on average but fails the Potential recall guard.
 - The frozen model is served by the platform through a tested patch, and HR stays in control: advice only, evidence shown for every requirement, and a review flag that catches 54% of Good Fit pairs."""
 # ---- optional: the epochs test on a Colab GPU (3 vs 5 epochs, seeds 42-44)
 from pathlib import Path as _P
@@ -49,14 +49,14 @@ if _ep.exists():
     d = _pd.read_csv(_ep)
     g = d.groupby("epochs")[["accuracy", "macro_f1", "good_fit_recall", "good_fit_precision", "potential_recall"]].agg(["mean", "std"])
     def _f(e, c): return f"{g.loc[e, (c, 'mean')]:.2f} ± {g.loc[e, (c, 'std')]:.2f}"
-    txt = ("- **More training (3 vs 5 epochs) does not fix the instability.** The same DistilBERT + Knowledge + evidence setting (D0) was trained for 3 and for 5 epochs "
-           f"on a Colab GPU, seeds 42–44 (a separate setting). 3 epochs: accuracy {_f(3,'accuracy')}, Good Fit recall {_f(3,'good_fit_recall')}; "
-           f"5 epochs: accuracy {_f(5,'accuracy')}, Good Fit recall {_f(5,'good_fit_recall')}.")
+    g5 = d[d.epochs == 5]
+    txt = ("- **More training (5 epochs instead of 3) helps on average but does not pass the rule.** On a Colab GPU (seeds 42–44, a separate setting), 5 epochs gave "
+           f"accuracy {_f(5,'accuracy')}, Good Fit recall {_f(5,'good_fit_recall')}, Good Fit precision {_f(5,'good_fit_precision')} and macro-F1 {_f(5,'macro_f1')}, all above the baseline, "
+           f"but Potential recall {_f(5,'potential_recall')}, more than 2 points below 29.68 (3 epochs: accuracy {_f(3,'accuracy')}, Good Fit recall {_f(3,'good_fit_recall')}).")
     if _en.exists():
         e = _pd.read_csv(_en).set_index("epochs")
-        txt += " Averaging the three seeds' probabilities (ensemble) gives " + "; ".join(
-            f"{int(k)} epochs: accuracy {e.loc[k,'accuracy']:.2f}, Good Fit recall {e.loc[k,'good_fit_recall']:.2f}, Potential recall {e.loc[k,'potential_recall']:.2f}" for k in e.index) + "."
-    txt += " Seed 44 is again the strongest seed on the GPU, which shows the seed effect is real and not a CPU accident; it is still one seed out of several."
+        txt += f" The 3-seed ensemble fails the same guard (5 epochs: accuracy {e.loc[5,'accuracy']:.2f}, Good Fit recall {e.loc[5,'good_fit_recall']:.2f}, Potential recall {e.loc[5,'potential_recall']:.2f})."
+    txt += " Seed 44 with 5 epochs passes the rule on its own (table above); with 3 seeds this is a lead to repeat, not a selected model."
     dist = dist.rstrip() + "\n" + txt + "\n"
 fills = dict(SUMMARY=summary, SINGLE_RUNS=open(_P(__file__).parent / "runs_section.md").read().strip(), DISTILBERT_SECTION=dist, FROZEN="M4 BERT-Tiny + Knowledge v1, original labels, seed 46 (the seed closest to the 8-seed mean).",
              PLATFORM_M4="A ready patch makes the platform serve the frozen model: the platform's own code reproduces the frozen validation result exactly (56.97), 106/106 tests pass, and the HR review flag (P(Good Fit) ≥ 0.30) catches 54% of Good Fit pairs.")

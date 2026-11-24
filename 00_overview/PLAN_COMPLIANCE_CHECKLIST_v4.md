@@ -25,14 +25,14 @@ Each line: what the plan asks → status → where. "OPEN" = not yet satisfied. 
 | Selection rule fixed before results | DONE | beat M4 on accuracy AND GF recall; no drop > 2 points in GF precision, macro-F1, Potential recall |
 | Stage 1: M1, M2, M4 | DONE | M4 = baseline (acc 56.79, GF recall 36.72, 8 seeds) |
 | Stage 2: M3, M5, M6 | DONE | all not eligible; M5 = DistilBERT (team decision); M6 not part of the team decision |
-| DistilBERT + Knowledge v1 through E0, E1, E2 (same inputs as BERT-Tiny) | DONE | DistilBERT + Knowledge: E0 50.30 ± 0.80 / GF recall 17.65 ± 11.31 (4 seeds); E1 50.77 ± 1.61 / 20.33 ± 16.50 (4); E2 D0 54.04 ± 3.44 / 40.40 ± 15.69 (8); E2 D1 54.82 ± 2.50 / 38.75 ± 10.81 (8). None meets the rule on average (FINAL_RESULTS_REPORT.md); best single run seed 44 on D0 (accuracy 60.93, Good Fit recall 66.09) reported but not selected: the rule compares means over seeds |
+| DistilBERT + Knowledge v1 through E0, E1, E2 (same inputs as BERT-Tiny) | DONE | DistilBERT + Knowledge: E0 50.30 ± 0.80 / GF recall 17.65 ± 11.31 (4 seeds); E1 50.77 ± 1.61 / 20.33 ± 16.50 (4); E2 D0 54.04 ± 3.44 / 40.40 ± 15.69 (8); E2 D1 54.82 ± 2.50 / 38.75 ± 10.81 (8). None meets the rule on average (FINAL_RESULTS_REPORT.md); best single run seed 44 on D0 (accuracy 60.93, Good Fit recall 66.09) reported but not selected: the rule compares means over seeds. Extra test on Colab GPU, 3 vs 5 epochs (seeds 42–44): 5 epochs beats the baseline on accuracy and Good Fit recall on average (57.05 / 53.52) but fails the Potential recall guard (23.58); D_experiments/DistilBERT_epochs_gpu_all_runs.csv |
 | Stage 3: M8 DistilBERT hybrid | DONE | full + 3 ablations: seed 42 on CPU, seeds 43–45 on Colab GPU (separate setting); none eligible |
 | Stage 4: M7 | NOT RUN | optional; outside the DistilBERT-only decision |
 | E0 | DONE | reproduced A1 exactly |
 | E1 (= A6) | DONE | mixed; not eligible |
 | E2 (D1 labels + evidence input) | DONE | BERT-Tiny: inside noise vs E1; not eligible. DistilBERT + Knowledge: see FINAL_RESULTS_REPORT.md |
 | E3 (semantic features) | DONE | precision/recall trade-off, no overall gain |
-| E4 (comparison and selection) | DONE | no setting eligible on average → M4 on D0 kept (as the plan allows); 5 single runs pass the rule and the closest setting (BERT-Tiny + Knowledge + evidence) is named as the first candidate to confirm (FINAL_RESULTS_REPORT.md 3c, ALL_RUNS_per_seed_validation.csv) |
+| E4 (comparison and selection) | DONE | no setting eligible on average → M4 on D0 kept (as the plan allows); 6 single runs pass the rule (out of 97) and the closest setting (BERT-Tiny + Knowledge + evidence) is named as the first candidate to confirm (FINAL_RESULTS_REPORT.md 3c, ALL_RUNS_per_seed_validation.csv) |
 | E5 (ablation) | DONE | M8 seed 42 (CPU) + seeds 43–45 on Colab GPU (separate setting; minus_evidence did not complete on GPU). None eligible (E5_ABLATION_REPORT.md) |
 | Seeds mean ± SD; single-seed marked | DONE | seed counts shown per row; paired seed-level tests with 95% CI (E4_ROBUSTNESS_CHECKS.md) |
 | Metrics incl. inference time | DONE (proxy) | BERT-Tiny in the platform: CV analysis with fit prediction p95 0.117 s per CV (PT-02); M5 DistilBERT 222 ms per pair on CPU |

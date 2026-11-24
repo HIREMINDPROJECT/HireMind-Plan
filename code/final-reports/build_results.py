@@ -161,7 +161,8 @@ lines += ["## 4. Notes", "",
           "None reaches the baseline accuracy (56.79). The single-seed CPU result of minus_struct (seed 42, Good Fit recall 48.79) did not repeat on other seeds, so the seed-42 M8 rows above should not be read as stable.",
           "- M4 E1 and M4 + evidence (E2) on D1 show the same mean Good Fit recall (24.91) by coincidence: the per-seed counts differ (E1: 74, 93, 59, 77, 58, 90, 52, 73; E2: 74, 80, 63, 60, 82, 91, 59, 67) but both sum to 576 of 8 × 289.",
           "- Per-job-group error analysis of the frozen model: D_error_analysis/ (error_pretags_by_job_group.csv).",
-          "- Runs not included: a 3- vs 5-epoch test of the same DistilBERT setting on a Colab GPU (seeds 42–44) finished, but its summary table was not exported to the project drive at submission time, so it is not used for any conclusion here. Its per-epoch log for seed 44 shows the same pattern as on CPU (seed 44 strongest: up to 61.10 accuracy and 66.44 Good Fit recall)."]
+          "- 3- vs 5-epoch test (section 3b, Colab GPU, seeds 42–44): per-run results in D_experiments/DistilBERT_epochs_gpu_all_runs.csv and the 3-seed ensembles in D_experiments/DistilBERT_epochs_gpu_ensemble.csv. "
+          "The 5-epoch mean beats the baseline on accuracy and Good Fit recall but fails the Potential recall guard; the 5-epoch ensemble (accuracy 60.15, Good Fit recall 58.13, Potential recall 19.39) fails the same guard."]
 OUT.write_text("\n".join(lines) + "\n")
 print("written", OUT, "models:", len(summ))
 for g, n, lab, dev, cms, note, ms, s in summ: print(f"{n:38s} {lab} n={len(cms)} acc={s['acc'][0]:.2f} gfr={s['gfr'][0]:.2f}")
