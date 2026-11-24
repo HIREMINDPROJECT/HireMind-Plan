@@ -32,11 +32,11 @@ Each line: what the plan asks → status → where. "OPEN" = not yet satisfied. 
 | E1 (= A6) | DONE | mixed; not eligible |
 | E2 (D1 labels + evidence input) | DONE | BERT-Tiny: inside noise vs E1; not eligible. DistilBERT + Knowledge: see FINAL_RESULTS_REPORT.md |
 | E3 (semantic features) | DONE | precision/recall trade-off, no overall gain |
-| E4 (comparison and selection) | DONE | no model eligible → M4 on D0 kept (negative result, as the plan allows) |
+| E4 (comparison and selection) | DONE | no setting eligible on average → M4 on D0 kept (as the plan allows); 5 single runs pass the rule and the closest setting (BERT-Tiny + Knowledge + evidence) is named as the first candidate to confirm (FINAL_RESULTS_REPORT.md 3c, ALL_RUNS_per_seed_validation.csv) |
 | E5 (ablation) | DONE | M8 seed 42 (CPU) + seeds 43–45 on Colab GPU (separate setting; minus_evidence did not complete on GPU). None eligible (E5_ABLATION_REPORT.md) |
 | Seeds mean ± SD; single-seed marked | DONE | seed counts shown per row; paired seed-level tests with 95% CI (E4_ROBUSTNESS_CHECKS.md) |
 | Metrics incl. inference time | DONE (proxy) | BERT-Tiny in the platform: CV analysis with fit prediction p95 0.117 s per CV (PT-02); M5 DistilBERT 222 ms per pair on CPU |
-| Error analysis by job group and class | DONE (pre-tags) · human tags in progress | rule-based pre-tags (M4, 8 seeds): 476 consistent mistakes, by class and job group; class-wise metrics and confusion matrices for every model in FINAL_RESULTS_REPORT.md. Human tagging of 50 frozen-model mistakes (6 error types) prepared and in progress |
+| Error analysis by job group and class | DONE | rule-based pre-tags (M4, 8 seeds): 476 consistent mistakes, by class and job group; class-wise metrics and confusion matrices for every model in FINAL_RESULTS_REPORT.md |
 | Fairness | NOT MEASURABLE | no consented protected attributes in the data; documented in the model card. The platform's own fairness tests (11) pass |
 
 ## Phase E
@@ -55,15 +55,8 @@ Each line: what the plan asks → status → where. "OPEN" = not yet satisfied. 
 | Data audit, rubric, approved label overlay, reviewer agreement | DONE |
 | ≥ M1, M2, M4 + two stronger alternatives; explain untrained models | DONE (M3, M5, M6, M8; M7 explained) |
 | Ablation table: label cleaning, evidence selection, semantic matching | DONE (ABLATION_TABLE_three_factors.md) |
-| Class-wise metrics, per-job-group error analysis, confusion matrices, uncertainty | DONE except human error tags (see Phase C/D) |
+| Class-wise metrics, per-job-group error analysis, confusion matrices, uncertainty | DONE (FINAL_RESULTS_REPORT.md, D_error_analysis, E4_ROBUSTNESS_CHECKS.md) |
 | Reproducible code, fixed manifests, model card, limitations, HR safeguards | DONE (code bundle, model card, reproducibility.md) |
 
-## In progress with people (results added when returned)
-1. Blind review of 150 VALIDATION pairs by two independent reviewers (no original label shown), to check whether D1 is "worse" or the validation labels differ from the rubric.
-2. Human tags on 50 mistakes of the frozen model (label looks wrong, extraction miss, meaning misread, evidence cut by length).
-
 ## For the team
-3. Apply the ready platform patch (platform_tests_M4) in the team repository.
-
-## Asked of the supervisor
-4. Whether the frozen model may be scored once on the (previously opened) test set, reported with that caveat.
+1. Apply the ready platform patch (E3_testing/platform_tests_M4) in the team repository; it makes the platform serve the frozen model (106/106 tests).

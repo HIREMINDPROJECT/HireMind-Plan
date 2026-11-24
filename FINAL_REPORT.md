@@ -9,7 +9,7 @@ The plan asked which of three factors (labels, evidence representation, classifi
 - **Evidence representation is the strongest factor.** It raises Good Fit recall for both encoders (BERT-Tiny 41.52 ± 12.39 vs 36.72 ± 11.28; DistilBERT + Knowledge 41.23 ± 16.76 with evidence vs 17.65 ± 11.31 without).
 - **Labels shift the class boundary rather than improve the model.** The reviewed labels (D1, 255 approved corrections) lower BERT-Tiny Good Fit recall by about 12 points (statistically clear) while raising Good Fit precision and Potential Fit recall.
 - **The classifier alone does not help.** DistilBERT without evidence is worse than BERT-Tiny and is unstable across seeds.
-- **No model meets the preset rule; the frozen baseline stays.** The highest mean Good Fit recall with at least 4 seeds is M4 + evidence (E2) (D0): 41.52 ± 12.39, at accuracy 56.30 ± 1.55.
+- **No setting meets the preset rule on average; the frozen baseline stays.** No setting beats the baseline **on average**. But **5 single runs do pass the rule** (three seeds of BERT-Tiny + Knowledge + evidence, two of DistilBERT + Knowledge + evidence, the best reaching accuracy 60.93 and Good Fit recall 66.09), and the closest setting on average, BERT-Tiny + Knowledge + evidence, raises Good Fit recall by 4.8 points with every guard kept and misses only on accuracy, by 0.49 points (less than the seed SD). It is the first candidate to confirm on new data.
 - The frozen model is served by the platform through a tested patch, and HR stays in control: advice only, evidence shown for every requirement, and a review flag that catches 54% of Good Fit pairs.
 
 ## 2. Problem and starting point
@@ -84,6 +84,23 @@ All numbers on validation; mean ± SD over seeds (one seed has no SD). Full clas
 
 **Error analysis (M4, 8 seeds).** 476 of 1,162 validation pairs are wrong in most seeds. Potential Fit (70%) and Good Fit (62%) are missed most; mistakes are somewhat more often pairs with ambiguous requirements (+10.5 points). Five job groups hold 30% of the consistent mistakes.
 
+### Single runs that pass the rule, and the closest setting
+Out of 89 individual runs (every seed of every model), **5 single runs pass the full selection rule** on their own, and 5 more beat the baseline on accuracy and Good Fit recall but drop more than 2 points on one guard metric. The full list is in D_experiments/ALL_RUNS_per_seed_validation.csv.
+
+| Run | Seed | Accuracy | Macro-F1 | Good Fit recall | Good Fit precision | Potential recall |
+|---|---|---|---|---|---|---|
+| *Baseline: BERT-Tiny + Knowledge, D0, mean of 8 seeds* | — | 56.79 | 48.61 | 36.72 | 43.68 | 29.68 |
+| DistilBERT + Knowledge + evidence, D0 | 44 | 60.93 | 56.57 | 66.09 | 56.34 | 32.65 |
+| BERT-Tiny + Knowledge + evidence, D0 | 46 | 59.29 | 53.58 | 50.87 | 48.04 | 33.33 |
+| DistilBERT + Knowledge + evidence, D1 | 48 | 57.75 | 50.14 | 37.37 | 57.45 | 29.59 |
+| BERT-Tiny + Knowledge + evidence, D0 | 47 | 57.40 | 52.52 | 66.44 | 45.07 | 27.89 |
+| BERT-Tiny + Knowledge + evidence, D0 | 42 | 56.97 | 50.70 | 43.25 | 46.13 | 32.31 |
+
+- **Why a single run is not enough.** The rule compares the mean of a setting with the baseline mean, because seeds move results a lot: 3 of the baseline's own 8 seeds also beat its mean on accuracy and Good Fit recall (seeds 43, 46, 49). Picking the best seed after seeing validation results would overstate what a setting delivers, and no unused test set is left to confirm a single run.
+- **The closest setting on average is BERT-Tiny + Knowledge + evidence (D0).** It keeps every guard (Good Fit precision, macro-F1 and Potential recall all within 2 points), raises Good Fit recall by 4.80 points, and misses only on accuracy, by 0.49 points, less than the seed-to-seed SD of the baseline (1.17). Compared seed by seed, it has higher Good Fit recall on 6 of 8 seeds. Three of its eight seeds pass the rule on their own.
+- **On the frozen seed itself (46),** which was chosen as the seed closest to the baseline mean and not from the evidence results, adding evidence gives accuracy 59.29 vs 56.97, Good Fit recall 50.87 vs 38.41, Good Fit precision 48.04 vs 43.87 and Potential recall 33.33 vs 27.21: better on every metric.
+- **Recommendation:** keep the frozen baseline as the rule requires, and treat BERT-Tiny + Knowledge + evidence as the first candidate to confirm on new data or a fresh test set; DistilBERT + Knowledge + evidence (seed 44: Good Fit recall 66.09) is the second.
+
 ### DistilBERT + Knowledge v1 taken through the plan's steps
 To answer the plan's classifier question fairly, DistilBERT received exactly the BERT-Tiny inputs (the Knowledge v1 line, and in E2 the B4 evidence selection) and went through the same steps, on CPU with the same seeds where finished (384 tokens).
 
@@ -112,7 +129,7 @@ To answer the plan's classifier question fairly, DistilBERT received exactly the
 - **Testing (E3):** prototype v3 passes 33/33 browser tests. Five HR participants reviewed two cases each; their four main findings were fixed in v3. The platform's own tests were re-run without changes: 105/105 tests, browser test on 20 screens, 5/5 non-functional tests. A ready patch makes the platform serve the frozen model: the platform's own code reproduces the frozen validation result exactly (56.97), 106/106 tests pass, and the HR review flag (P(Good Fit) ≥ 0.30) catches 54% of Good Fit pairs.
 
 ## 7. Limitations and ethics
-- **Validation labels are not reviewed.** D1 changes TRAIN only, so D1 models are judged against the original labels; a blind review of 150 validation pairs has been prepared to check this.
+- **Validation labels are not reviewed.** D1 changes TRAIN only, so D1 models are judged against the original labels; part of D1's lower Good Fit recall can come from this difference in the definition of Good Fit.
 - **Same CVs in TRAIN and VALIDATION** (1,157 of 1,162 validation CVs appear in TRAIN with other jobs): validation scores are probably optimistic for unseen CVs.
 - **Seed variance is large** (BERT-Tiny Good Fit recall from 13 to 49 across seeds); only means over several seeds are interpreted.
 - **Extraction** is rule-based with modest recall; "not mentioned" can be an extraction miss, so the interface says it is not evidence of absence.

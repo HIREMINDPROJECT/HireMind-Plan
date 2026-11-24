@@ -44,7 +44,7 @@ Status: system test of the standalone prototype, SYNTHETIC data only. Not a user
 
 Note on V21: browsers show the leave-page warning only after a real user gesture on the page (a Chromium rule). The test types into the reason field first, as a person would.
 
-## Still open
+## Open at v2 (closed in v3: see E3_prototype_v3_changes_and_retest.md, E3_HR_feedback_section.md and platform_tests_M4/)
 - HR participant sessions (no feedback exists yet); wording comprehension (UX-04) must be checked with people.
 - Platform integration and persistence (UX-03 server side, UX-09).
 - Real example cases (UX-10).

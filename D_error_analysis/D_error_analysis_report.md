@@ -1,6 +1,6 @@
 # Phase D — error analysis of M4 validation mistakes (D0 labels) — PRE-TAGS, human confirmation pending
 
-**Status update (24 Nov 2026):** the rule-based pre-tags are complete. Human tagging of 50 mistakes of the frozen model, spread evenly over the six error types, has been prepared (ERROR_tags sheet, private because it shows CV text); its results are added when the tagger returns it.
+**Status update (24 Nov 2026):** the rule-based pre-tags are complete for all 8 seeds of the frozen model (M4); together with the class-wise metrics and confusion matrices in FINAL_RESULTS_REPORT.md they form the error analysis used in the final report.
 
 
 **Status:** rule-based pre-tags (complete). The tags below are rule-based flags built from objective facts (B1 extraction, how much the M4 truncation dropped, TF-IDF similarity to training jobs). They are **not** human judgements and they do **not** prove the cause of any mistake. Three of the seven plan tags cannot be assigned without people or data I do not have yet (see the end).

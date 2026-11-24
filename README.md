@@ -38,11 +38,11 @@ It builds on the team repositories, which are not changed: `Hams770/HireMind-DL`
 - **`results/`** holds the files committed by every finished GitHub Actions run (metrics, per-seed results, confusion matrices, epoch logs, package versions). Each folder name contains the run ID. `results/RUNS_INDEX.md` lists the runs included and the failed or cancelled ones left out.
 - **`weights/`** holds the 8 M4 checkpoints (BERT-Tiny + Knowledge v1, seeds 42–49) with `SHA256SUMS.txt`. The frozen model is seed 46, SHA-256 `0953ce892ee0f075d37c1e6b4ff0bceb02a7932fddbca0ee5954f5e17fcb0c8e`.
 - **Branch and run names in the reports.** The runs were made with GitHub Actions in the project's working copy of this repository. Reports name the branch and the run ID: the code of a branch is in `code/<branch>/`, and the files a run produced are in `results/<results branch>/`. Addresses in logs and workflows are written as this repository.
-- **`colab_notebooks/`** holds the notebooks used on Colab: the frozen-model re-load check, the 10 example cases, the human-review sheets, and the DistilBERT, epochs and M8 runs on GPU. They fetch code and weights from this repository, so the repository must be public (or the user signed in) for them to run.
+- **`colab_notebooks/`** holds the notebooks used on Colab: the frozen-model re-load check with the 10 example cases, and the DistilBERT, epochs and M8 runs on GPU. They fetch code and weights from this repository, so the repository must be public (or the user signed in) for them to run.
 
 ## How to check the frozen model in 5 minutes
-1. Open `colab_notebooks/HireMind_human_review_sheets_Colab.ipynb` in Colab (CPU is enough).
-2. Run the first three cells.
+1. Open `colab_notebooks/HireMind_E2_10_real_cases_Colab.ipynb` in Colab (CPU is enough).
+2. Run the first two code cells.
 3. The notebook downloads the seed-46 weights from `weights/`, checks the SHA-256, and re-scores validation. It must print **accuracy 56.97**.
 
 ## Putting the frozen model into the platform
@@ -50,8 +50,3 @@ It builds on the team repositories, which are not changed: `Hams770/HireMind-DL`
 cd Senior-2 && git apply E3_testing/platform_tests_M4/m4_platform_final.patch && bash backend/models/get_m4_weights.sh
 cd backend && pytest -q        # 106 passed (with requirements-model.txt installed)
 ```
-
-## Still open (results added when they come back)
-1. **Blind review of 150 validation pairs** by two independent reviewers. Sheets are prepared privately.
-2. **Human tags on 50 mistakes** of the frozen model.
-3. **Test set:** a question to the supervisor on whether the frozen model may be scored once on the previously opened test set.

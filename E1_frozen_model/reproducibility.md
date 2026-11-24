@@ -17,7 +17,7 @@ Expected (validation, D0): accuracy 56.97, macro-F1 48.80, Good Fit recall 38.41
 ## Verified so far
 - The 8-seed CPU run was reproduced twice with identical metrics (A1 fresh run and E0); all 8 checkpoint hashes match the A1 inventory.
 - 7 of 8 seeds match the original team report exactly; seed 45 differs for a documented reason (A1_numerical_differences_v2.md).
-- **Independent re-use of the frozen weights (24 Nov 2026):** on a fresh Google Colab machine (CPU), the published seed-46 weights were downloaded from the weights/ folder of HIREMINDPROJECT/HireMind-Plan (SHA-256 check passed), the validation split was rebuilt from the pinned dataset and manifest, the Knowledge v1 line was added with the pinned team code, and the model was scored: **accuracy 56.97, identical to the frozen result.** Notebook: HireMind_human_review_sheets_Colab.ipynb (cells 1–3).
+- **Independent re-use of the frozen weights (24 Nov 2026):** on a fresh Google Colab machine (CPU), the published seed-46 weights were downloaded from the weights/ folder of HIREMINDPROJECT/HireMind-Plan (SHA-256 check passed), the validation split was rebuilt from the pinned dataset and manifest, the Knowledge v1 line was added with the pinned team code, and the model was scored: **accuracy 56.97, identical to the frozen result.** Notebook: colab_notebooks/HireMind_E2_10_real_cases_Colab.ipynb (its first cells re-score the frozen model and stop unless validation accuracy is 56.97).
 
 ## Load and score the frozen model (no training)
 ```

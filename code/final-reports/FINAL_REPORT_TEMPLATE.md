@@ -41,6 +41,8 @@ Models trained in the plan's stages: M1 logistic regression and M2 linear SVM (T
 
 **Error analysis (M4, 8 seeds).** 476 of 1,162 validation pairs are wrong in most seeds. Potential Fit (70%) and Good Fit (62%) are missed most; mistakes are somewhat more often pairs with ambiguous requirements (+10.5 points). Five job groups hold 30% of the consistent mistakes.
 
+{{SINGLE_RUNS}}
+
 {{DISTILBERT_SECTION}}
 
 ## 6. Phase E — frozen model, HR prototype, testing
@@ -49,7 +51,7 @@ Models trained in the plan's stages: M1 logistic regression and M2 linear SVM (T
 - **Testing (E3):** prototype v3 passes 33/33 browser tests. Five HR participants reviewed two cases each; their four main findings were fixed in v3. The platform's own tests were re-run without changes: 105/105 tests, browser test on 20 screens, 5/5 non-functional tests. {{PLATFORM_M4}}
 
 ## 7. Limitations and ethics
-- **Validation labels are not reviewed.** D1 changes TRAIN only, so D1 models are judged against the original labels; a blind review of 150 validation pairs has been prepared to check this.
+- **Validation labels are not reviewed.** D1 changes TRAIN only, so D1 models are judged against the original labels; part of D1's lower Good Fit recall can come from this difference in the definition of Good Fit.
 - **Same CVs in TRAIN and VALIDATION** (1,157 of 1,162 validation CVs appear in TRAIN with other jobs): validation scores are probably optimistic for unseen CVs.
 - **Seed variance is large** (BERT-Tiny Good Fit recall from 13 to 49 across seeds); only means over several seeds are interpreted.
 - **Extraction** is rule-based with modest recall; "not mentioned" can be an extraction miss, so the interface says it is not evidence of absence.

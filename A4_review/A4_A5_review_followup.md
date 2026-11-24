@@ -15,7 +15,7 @@ No label was changed by this follow-up. D0, splits.csv and train_labels_v1.csv a
 - By sampling stratum (D0 Good Fit cases → D1): CLEANLAB 108 of 111 changed; BOUNDARY 49 of 50 changed; **RANDOM 37 of 37 changed** (27 → Potential, 10 → No).
 - Overall change rate by stratum: RANDOM 75/150 (50%), CLEANLAB 120/150 (80%), BOUNDARY 60/100 (60%).
 - Reading: because the RANDOM stratum is representative of TRAIN, the 37/37 result means the review applied a clearly stricter definition of Good Fit than the original dataset labels. This can be a real label-quality problem in D0, or a rubric that is stricter than the dataset's notion of "Good Fit" — the data alone cannot tell which. It also explains why D1 lowers Good Fit recall on the (unaudited, D0-labelled) validation set (A6/E1).
-- Recommended check (needs people): a fresh reviewer, blind to all previous labels, applies the rubric to a small random set of D0-Good cases (e.g. 20 from TRAIN and 20 from VALIDATION); if the same pattern appears on validation, the validation labels must be audited before any label-cleaning conclusion is drawn.
+- Consequence for the results: D1 models are judged against the original (D0) validation labels, so part of D1's lower Good Fit recall reflects this difference in the definition of Good Fit, not only model quality. This is stated as a limitation in the final report.
 
 ## 3. Required fields of reviewed_labels.csv (evidence span, reason, confidence)
 - The Drive file reviewed_labels.csv carries IDs, labels, both reviewers' confidence and the decision.

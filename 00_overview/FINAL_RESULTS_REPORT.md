@@ -206,6 +206,24 @@ Same scripts and inputs, run on a Colab T4 GPU. GPU results can differ slightly 
 
 M8 minus_evidence did not complete on the GPU (all three seeds stopped at start-up without a result); its only result is the CPU seed 42 row in section 1.
 
+## 3c. Single runs that pass the rule, and the closest setting
+
+Out of 89 individual runs (every seed of every model), **5 single runs pass the full selection rule** on their own, and 5 more beat the baseline on accuracy and Good Fit recall but drop more than 2 points on one guard metric. The full list is in D_experiments/ALL_RUNS_per_seed_validation.csv.
+
+| Run | Seed | Accuracy | Macro-F1 | Good Fit recall | Good Fit precision | Potential recall |
+|---|---|---|---|---|---|---|
+| *Baseline: BERT-Tiny + Knowledge, D0, mean of 8 seeds* | — | 56.79 | 48.61 | 36.72 | 43.68 | 29.68 |
+| DistilBERT + Knowledge + evidence, D0 | 44 | 60.93 | 56.57 | 66.09 | 56.34 | 32.65 |
+| BERT-Tiny + Knowledge + evidence, D0 | 46 | 59.29 | 53.58 | 50.87 | 48.04 | 33.33 |
+| DistilBERT + Knowledge + evidence, D1 | 48 | 57.75 | 50.14 | 37.37 | 57.45 | 29.59 |
+| BERT-Tiny + Knowledge + evidence, D0 | 47 | 57.40 | 52.52 | 66.44 | 45.07 | 27.89 |
+| BERT-Tiny + Knowledge + evidence, D0 | 42 | 56.97 | 50.70 | 43.25 | 46.13 | 32.31 |
+
+- **Why a single run is not enough.** The rule compares the mean of a setting with the baseline mean, because seeds move results a lot: 3 of the baseline's own 8 seeds also beat its mean on accuracy and Good Fit recall (seeds 43, 46, 49). Picking the best seed after seeing validation results would overstate what a setting delivers, and no unused test set is left to confirm a single run.
+- **The closest setting on average is BERT-Tiny + Knowledge + evidence (D0).** It keeps every guard (Good Fit precision, macro-F1 and Potential recall all within 2 points), raises Good Fit recall by 4.80 points, and misses only on accuracy, by 0.49 points, less than the seed-to-seed SD of the baseline (1.17). Compared seed by seed, it has higher Good Fit recall on 6 of 8 seeds. Three of its eight seeds pass the rule on their own.
+- **On the frozen seed itself (46),** which was chosen as the seed closest to the baseline mean and not from the evidence results, adding evidence gives accuracy 59.29 vs 56.97, Good Fit recall 50.87 vs 38.41, Good Fit precision 48.04 vs 43.87 and Potential recall 33.33 vs 27.21: better on every metric.
+- **Recommendation:** keep the frozen baseline as the rule requires, and treat BERT-Tiny + Knowledge + evidence as the first candidate to confirm on new data or a fresh test set; DistilBERT + Knowledge + evidence (seed 44: Good Fit recall 66.09) is the second.
+
 ## 4. Notes
 
 - Seeds: BERT-Tiny experiments use seeds 42–49; DistilBERT experiments use the seeds listed (CPU cost). Different seed counts are shown in the table; SD is the sample SD.

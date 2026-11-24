@@ -147,6 +147,9 @@ if _gpu:
     if (PKG / "D_experiments" / "M8_colab_gpu_seeds43-45.csv").exists():
         lines += ["", "M8 minus_evidence did not complete on the GPU (all three seeds stopped at start-up without a result); its only result is the CPU seed 42 row in section 1."]
     lines.append("")
+_rs = Path(__file__).parent / "runs_section.md"
+if _rs.exists():
+    lines += ["## 3c. " + _rs.read_text().split("\n", 1)[0].lstrip("# ").strip(), ""] + _rs.read_text().split("\n", 1)[1].strip().splitlines() + [""]
 lines += ["## 4. Notes", "",
           "- Seeds: BERT-Tiny experiments use seeds 42–49; DistilBERT experiments use the seeds listed (CPU cost). Different seed counts are shown in the table; SD is the sample SD.",
           "- DistilBERT runs use max length 384 (512 was projected over the CPU time budget); M8 uses 512. BERT-Tiny uses 512.",
