@@ -13,7 +13,7 @@ RULES = [
      f"{GET_PLAN} && mkdir -p _m8 && cp -r _plan/code/m8-distilbert/m8 _m8/ && cp _plan/code/m8-seeds/m8/m8_distilbert.py _m8/m8/"),
     (re.compile(r"wget -q -O m4_s46\.pt https://github\.com/\S+?a1_knowledge_M4_seed46_weights\.pt \|\| wget -q -O m4_s46\.pt https://github\.com/\S+?a1_knowledge_M4_seed46_weights\.pt"),
      "wget -q -O m4_s46.pt https://github.com/HIREMINDPROJECT/HireMind-Plan/raw/main/weights/a1_knowledge_M4_seed46_weights.pt"),
-    (re.compile(r"!rm -rf _dl _s2 _m5 _m8 _plan _plan"), "!rm -rf _dl _s2 _m5 _m8 _plan _plan _plan"),
+    (re.compile(r"!rm -rf _dl _s2 _m5 _m8 _plan(?: _plan)*"), "!rm -rf _dl _s2 _m5 _m8 _plan"),
     # repository and weights addresses
     (re.compile(r"(?:HIREMINDPROJECT|HIREMINDPROJECT)/HireMind-DL", re.I), "HIREMINDPROJECT/HireMind-Plan"),
     (re.compile(r"HIREMINDPROJECT", re.I), "HIREMINDPROJECT"),
