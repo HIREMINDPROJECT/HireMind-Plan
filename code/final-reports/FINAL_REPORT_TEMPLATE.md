@@ -59,9 +59,7 @@ Models trained in the plan's stages: M1 logistic regression and M2 linear SVM (T
 
 ## 8. Deviations from the plan
 - Accepted by the supervisor: B2 gold annotated by one person instead of two; B3 and M8 use DistilBERT only (team decision) instead of all-MiniLM-L6-v2.
-- Compute limits, stated with every number: DistilBERT runs use 384 tokens (512 did not fit the CPU time budget) and, where noted, fewer seeds than BERT-Tiny; M7 (optional in the plan) was not run.
+- Compute limits: the DistilBERT plan runs used 384 tokens on CPU and were repeated at 512 on GPU (section 5); some DistilBERT settings have fewer seeds, as shown; M7 (optional) was not run.
 
 ## 9. Where everything is
-Every claim above points to a file in this package: phase folders A1–E3, FINAL_RESULTS_REPORT.md (all models, class-wise metrics, confusion matrices), E4_ROBUSTNESS_CHECKS.md, E3_TEST_COVERAGE_vs_PLAN.md, PLAN_COMPLIANCE_CHECKLIST, and HireMind_code_bundle.zip (code and the exact workflows that produced every number).
-
-The GitHub repository **HIREMINDPROJECT/HireMind-Plan** holds the same package together with the code, the files produced by every GitHub Actions run, the Colab notebooks, and the 8 checkpoints of the frozen model with SHA-256.
+Every claim above points to a file in this package: phase folders A1–E3, FINAL_RESULTS_REPORT.md (all models, confusion matrices), 512_token_followup, E4_ROBUSTNESS_CHECKS.md, E3_TEST_COVERAGE_vs_PLAN.md, the PLAN_COMPLIANCE_CHECKLIST and HireMind_code_bundle.zip (the code and workflows behind every number). GitHub **HIREMINDPROJECT/HireMind-Plan** holds this package with the code, every run's output files, the Colab notebooks and the frozen model's 8 checkpoints (SHA-256).

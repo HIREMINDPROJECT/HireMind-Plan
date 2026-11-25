@@ -208,6 +208,19 @@ Same scripts and inputs, run on a Colab T4 GPU. GPU results can differ slightly 
 
 M8 minus_evidence did not complete on the GPU (all three seeds stopped at start-up without a result); its only result is the CPU seed 42 row in section 1.
 
+## 3d. DistilBERT at 512 tokens (GPU follow-up, 25 Nov)
+
+Every DistilBERT plan step repeated with the full 512-token input (the budget B4 was designed for, and the baseline's), on NVIDIA T4 GPUs with mixed precision, 5 epochs, lr 3e-5, batch 16, best validation macro-F1 checkpoint. E2 arms: seeds 42–49; E0/E1 arms: seeds 42–44. Files: 512_token_followup/ (supervisor brief, full report, every run, code).
+
+| Model | Labels | Seeds | Accuracy | Macro-F1 | Good Fit recall | Good Fit precision | Potential recall | Meets rule |
+|---|---|---|---|---|---|---|---|---|
+| M5 + Knowledge (E0), 512 | D0 | 3 (42, 43, 44) | 52.15 ± 3.08 | 43.21 ± 3.14 | 18.92 ± 3.29 | 35.07 ± 9.78 | 36.28 ± 4.78 | no |
+| M5 + Knowledge (E1), 512 | D1 | 3 (42, 43, 44) | 53.53 ± 1.45 | 45.02 ± 3.12 | 22.95 ± 8.22 | 37.43 ± 9.20 | 36.39 ± 2.23 | no |
+| M5 + Knowledge + evidence (E2), 512 | D0 | 8 (42, 43, 44, 45, 46, 47, 48, 49) | 54.91 ± 2.52 | 47.63 ± 3.90 | 37.63 ± 13.46 | 42.88 ± 8.72 | 29.80 ± 3.01 | no |
+| M5 + Knowledge + evidence (E2), 512 | D1 | 8 (42, 43, 44, 45, 46, 47, 48, 49) | 56.26 ± 2.39 | 49.17 ± 2.64 | 35.99 ± 7.60 | 46.94 ± 8.38 | 33.76 ± 7.27 | no |
+
+No configuration meets the rule on average. Single runs that pass on their own: Knowledge + evidence, D0 seed 49 (58.86 / 48.79); Knowledge + evidence, D1 seed 44 (57.40 / 43.25); Knowledge + evidence, D1 seed 49 (58.86 / 39.45). Against the 384-token CPU runs, accuracy rises in every configuration (+0.9 to +2.8) and Potential recall rises (+6.6 to +19.4), while Good Fit recall with evidence falls slightly (−2.8). These runs use a different device and 5 epochs, so they are a separate setting and are not averaged with the 384-token runs.
+
 ## 3c. Single runs that pass the rule, and the closest setting
 
 Out of 97 individual runs (every seed of every model), **6 single runs pass the full selection rule** on their own, and 6 more beat the baseline on accuracy and Good Fit recall but drop more than 2 points on one guard metric. The full list is in D_experiments/ALL_RUNS_per_seed_validation.csv.
@@ -226,12 +239,12 @@ Out of 97 individual runs (every seed of every model), **6 single runs pass the 
 - **The closest setting on average is BERT-Tiny + Knowledge + evidence (D0).** It keeps every guard (Good Fit precision, macro-F1 and Potential recall all within 2 points), raises Good Fit recall by 4.80 points, and misses only on accuracy, by 0.49 points, less than the seed-to-seed SD of the baseline (1.17). Compared seed by seed, it has higher Good Fit recall on 6 of 8 seeds. Three of its eight seeds pass the rule on their own.
 - **DistilBERT + Knowledge + evidence trained for 5 epochs (Colab GPU, 3 seeds)** is the other near miss on average: accuracy 57.05, Good Fit recall 53.52, Good Fit precision 46.29 and macro-F1 49.89 are all above the baseline, but Potential recall falls to 23.58, more than 2 points below 29.68, so it fails the rule. With only 3 seeds on a different device it is a lead to repeat with more seeds, not a result.
 - **On the frozen seed itself (46),** which was chosen as the seed closest to the baseline mean and not from the evidence results, adding evidence gives accuracy 59.29 vs 56.97, Good Fit recall 50.87 vs 38.41, Good Fit precision 48.04 vs 43.87 and Potential recall 33.33 vs 27.21: better on every metric.
-- **Recommendation:** keep the frozen baseline as the rule requires, and treat BERT-Tiny + Knowledge + evidence as the first candidate to confirm on new data or a fresh test set; DistilBERT + Knowledge + evidence (seed 44: Good Fit recall about 66 on CPU and on GPU), preferably trained for 5 epochs, is the second.
+- **Recommendation:** keep the frozen baseline as the rule requires, and treat BERT-Tiny + Knowledge + evidence as the first candidate to confirm on new data or a fresh test set. DistilBERT + Knowledge + evidence does not meet the rule on average at 512 tokens either (DistilBERT 512 follow-up).
 
 ## 4. Notes
 
 - Seeds: BERT-Tiny experiments use seeds 42–49; DistilBERT experiments use the seeds listed (CPU cost). Different seed counts are shown in the table; SD is the sample SD.
-- DistilBERT runs use max length 384 (512 was projected over the CPU time budget); M8 uses 512. BERT-Tiny uses 512.
+- The DistilBERT plan runs in sections 1–3c use max length 384 (512 was projected over the CPU time budget); section 3d repeats every DistilBERT plan step at 512 on GPU. M8 uses 512. BERT-Tiny uses 512.
 - Same CVs in TRAIN and VALIDATION: job groups are disjoint, but 1,157 of the 1,162 validation CVs also appear in TRAIN; all validation scores are probably optimistic for unseen CVs.
 - A team member also ran DistilBERT on a Colab GPU on 22 Nov (lr 1e-4, 512 tokens, 3 seeds; plain: accuracy 48.48, macro-F1 36.81, Good Fit recall 22.95; + Knowledge v1: 47.90 / 39.47 / 16.61). Those runs use a different device and learning rate, so they are reported here as a separate setting and are not averaged with the CPU runs.
 - **M8 more seeds, Colab GPU (separate setting, 24 Nov).** The M8 variants were re-run on a Colab GPU with the same script, seeds 43–45, D0 (mean ± SD over 3 seeds): full accuracy 53.07, Good Fit recall 28.14 ± 14.6; minus_knowledge 54.10, Good Fit recall 44.64 ± 5.0; minus_struct 52.93, Good Fit recall 27.68 ± 7.6. None reaches the baseline accuracy (56.79). The single-seed CPU result of minus_struct (seed 42, Good Fit recall 48.79) did not repeat on other seeds, so the seed-42 M8 rows above should not be read as stable.

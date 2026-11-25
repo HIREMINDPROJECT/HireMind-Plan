@@ -26,6 +26,7 @@ Each line: what the plan asks → status → where. "OPEN" = not yet satisfied. 
 | Stage 1: M1, M2, M4 | DONE | M4 = baseline (acc 56.79, GF recall 36.72, 8 seeds) |
 | Stage 2: M3, M5, M6 | DONE | all not eligible; M5 = DistilBERT (team decision); M6 not part of the team decision |
 | DistilBERT + Knowledge v1 through E0, E1, E2 (same inputs as BERT-Tiny) | DONE | DistilBERT + Knowledge: E0 50.30 ± 0.80 / GF recall 17.65 ± 11.31 (4 seeds); E1 50.77 ± 1.61 / 20.33 ± 16.50 (4); E2 D0 54.04 ± 3.44 / 40.40 ± 15.69 (8); E2 D1 54.82 ± 2.50 / 38.75 ± 10.81 (8). None meets the rule on average (FINAL_RESULTS_REPORT.md); best single run seed 44 on D0 (accuracy 60.93, Good Fit recall 66.09) reported but not selected: the rule compares means over seeds. Extra test on Colab GPU, 3 vs 5 epochs (seeds 42–44): 5 epochs beats the baseline on accuracy and Good Fit recall on average (57.05 / 53.52) but fails the Potential recall guard (23.58); D_experiments/DistilBERT_epochs_gpu_all_runs.csv |
+| DistilBERT plan steps repeated at 512 tokens (same input budget as BERT-Tiny) | DONE | GPU, 5 epochs, 22 trainings: E0 52.15 / GF recall 18.92 (3 seeds); E1 53.53 / 22.95 (3); E2 D0 54.91 / 37.63 (8); E2 D1 56.26 / 35.99 (8). None meets the rule; 3 single runs pass alone (reported, not selected); 512_token_followup/ |
 | Stage 3: M8 DistilBERT hybrid | DONE | full + 3 ablations: seed 42 on CPU, seeds 43–45 on Colab GPU (separate setting); none eligible |
 | Stage 4: M7 | NOT RUN | optional; outside the DistilBERT-only decision |
 | E0 | DONE | reproduced A1 exactly |

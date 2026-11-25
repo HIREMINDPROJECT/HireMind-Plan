@@ -147,12 +147,31 @@ if _gpu:
     if (PKG / "D_experiments" / "M8_colab_gpu_seeds43-45.csv").exists():
         lines += ["", "M8 minus_evidence did not complete on the GPU (all three seeds stopped at start-up without a result); its only result is the CPU seed 42 row in section 1."]
     lines.append("")
+_f512 = PKG / "512_token_followup" / "distilbert_512_all_runs.csv"
+if _f512.exists():
+    import pandas as _pd5
+    _d = _pd5.read_csv(_f512)
+    lines += ["## 3d. DistilBERT at 512 tokens (GPU follow-up, 25 Nov)", "",
+              "Every DistilBERT plan step repeated with the full 512-token input (the budget B4 was designed for, and the baseline's), on NVIDIA T4 GPUs with mixed precision, 5 epochs, lr 3e-5, batch 16, best validation macro-F1 checkpoint. "
+              "E2 arms: seeds 42–49; E0/E1 arms: seeds 42–44. Files: 512_token_followup/ (supervisor brief, full report, every run, code).", "",
+              "| Model | Labels | Seeds | Accuracy | Macro-F1 | Good Fit recall | Good Fit precision | Potential recall | Meets rule |", "|---|---|---|---|---|---|---|---|---|"]
+    _cols = ["accuracy", "macro_f1", "good_fit_recall", "good_fit_precision", "potential_recall"]
+    for _cfg, _lab, _name in (("Knowledge only, D0 (E0)", "D0", "M5 + Knowledge (E0), 512"), ("Knowledge only, D1 (E1)", "D1", "M5 + Knowledge (E1), 512"),
+                              ("Knowledge + evidence, D0 (E2)", "D0", "M5 + Knowledge + evidence (E2), 512"), ("Knowledge + evidence, D1 (E2)", "D1", "M5 + Knowledge + evidence (E2), 512")):
+        g = _d[_d.configuration == _cfg]
+        ms = {c: (g[c].mean(), g[c].std()) for c in _cols}
+        ok = (ms["accuracy"][0] > 56.79 and ms["good_fit_recall"][0] > 36.72 and ms["good_fit_precision"][0] >= 43.68 - 2 and ms["macro_f1"][0] >= 48.61 - 2 and ms["potential_recall"][0] >= 29.68 - 2)
+        lines.append(f"| {_name} | {_lab} | {len(g)} ({', '.join(str(int(x)) for x in g.seed)}) | " + " | ".join(fmt(ms[c]) for c in _cols) + f" | {'yes' if ok else 'no'} |")
+    _p = _d[_d.passes_full_rule]
+    lines += ["", f"No configuration meets the rule on average. Single runs that pass on their own: " + "; ".join(f"{r.configuration.split(' (')[0]} seed {r.seed} ({r.accuracy:.2f} / {r.good_fit_recall:.2f})" for r in _p.itertuples()) + ". "
+              "Against the 384-token CPU runs, accuracy rises in every configuration (+0.9 to +2.8) and Potential recall rises (+6.6 to +19.4), while Good Fit recall with evidence falls slightly (−2.8). "
+              "These runs use a different device and 5 epochs, so they are a separate setting and are not averaged with the 384-token runs.", ""]
 _rs = Path(__file__).parent / "runs_section.md"
 if _rs.exists():
     lines += ["## 3c. " + _rs.read_text().split("\n", 1)[0].lstrip("# ").strip(), ""] + _rs.read_text().split("\n", 1)[1].strip().splitlines() + [""]
 lines += ["## 4. Notes", "",
           "- Seeds: BERT-Tiny experiments use seeds 42–49; DistilBERT experiments use the seeds listed (CPU cost). Different seed counts are shown in the table; SD is the sample SD.",
-          "- DistilBERT runs use max length 384 (512 was projected over the CPU time budget); M8 uses 512. BERT-Tiny uses 512.",
+          "- The DistilBERT plan runs in sections 1–3c use max length 384 (512 was projected over the CPU time budget); section 3d repeats every DistilBERT plan step at 512 on GPU. M8 uses 512. BERT-Tiny uses 512.",
           "- Same CVs in TRAIN and VALIDATION: job groups are disjoint, but 1,157 of the 1,162 validation CVs also appear in TRAIN; all validation scores are probably optimistic for unseen CVs.",
           "- A team member also ran DistilBERT on a Colab GPU on 22 Nov (lr 1e-4, 512 tokens, 3 seeds; plain: accuracy 48.48, macro-F1 36.81, Good Fit recall 22.95; + Knowledge v1: 47.90 / 39.47 / 16.61). "
           "Those runs use a different device and learning rate, so they are reported here as a separate setting and are not averaged with the CPU runs.",
