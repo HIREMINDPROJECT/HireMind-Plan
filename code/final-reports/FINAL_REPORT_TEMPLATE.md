@@ -33,7 +33,7 @@ HireMind suggests, for a CV and a job description, whether the candidate is a **
 | B4 Truncation | Keep the sentences with requirements and evidence instead of cutting the tail | Relevant CV evidence kept 33% → 80%; job requirements kept 34% → 90%, same 512-token budget |
 
 ## 5. Phase C/D — models and controlled experiments
-Models trained in the plan's stages: M1 logistic regression and M2 linear SVM (TF-IDF), M3 XGBoost on structured features, M4 BERT-Tiny + Knowledge v1, M5 DistilBERT, M6 MiniLM + logistic regression, M8 DistilBERT hybrid (evidence + Knowledge + structured features) with its ablations. M7 (DeBERTa) was optional and not run on CPU. DistilBERT was additionally taken through the same plan steps as BERT-Tiny (E0, E1, E2), with the Knowledge v1 line, so that the two encoders are compared on identical inputs.
+Models trained in the plan's stages: M1 logistic regression and M2 linear SVM (TF-IDF), M3 XGBoost on structured features, M4 BERT-Tiny + Knowledge v1, M5 DistilBERT, M6 MiniLM + logistic regression, M8 DistilBERT hybrid (evidence + Knowledge + structured features) with its ablations. M7 (optional in the plan) was not run. DistilBERT was additionally taken through the same plan steps as BERT-Tiny (E0, E1, E2), with the Knowledge v1 line, so that the two encoders are compared on identical inputs.
 
 {{RESULTS_TABLE}}
 
