@@ -2,11 +2,12 @@
 
 The DistilBERT runs in `FINAL_REPORT.pdf` used 384 input tokens, because 512 did not fit the CPU time budget, while the baseline (BERT-Tiny + Knowledge v1) used 512. This folder removes that limitation: every DistilBERT step of the plan was repeated at the full 512-token budget, on GPU, with 5 epochs.
 
-**Start with `DistilBERT_512_results.pdf`** (4 pages: what was done, all results, what did better and why, conclusion).
+**Start with `DistilBERT_512_Supervisor_Brief.pdf`** (4-page brief for the supervisor). `DistilBERT_512_results.pdf` is the full 4-page results report with figures.
 
 | File | Content |
 |---|---|
-| `DistilBERT_512_results.pdf` | The report |
+| `DistilBERT_512_Supervisor_Brief.pdf` | Supervisor brief: finding, design, all results, interpretation and decision |
+| `DistilBERT_512_results.pdf` | Full results report with figures |
 | `distilbert_512_all_runs.csv` | Every training (22): configuration, seed, best epoch, the five metrics, and the preset-rule check |
 | `code/c_stage2_gpu.py` | The training script (the plan's M5 script with GPU, fp16 autocast, a full 16-pair batch per step) |
 | `code/run_queue.py` | Runs all 22 trainings on the GPUs of one machine |

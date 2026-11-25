@@ -52,4 +52,4 @@ cd backend && pytest -q        # 106 passed (with requirements-model.txt install
 ```
 
 ## Follow-up: DistilBERT at 512 tokens
-The DistilBERT runs above used 384 tokens. `512_token_followup/` repeats every DistilBERT plan step at the full 512-token budget (GPU, 5 epochs, 22 trainings): report `512_token_followup/DistilBERT_512_results.pdf`, every run in `distilbert_512_all_runs.csv`. The conclusion is unchanged.
+The DistilBERT runs above used 384 tokens. `512_token_followup/` repeats every DistilBERT plan step at the full 512-token budget (GPU, 5 epochs, 22 trainings): supervisor brief `512_token_followup/DistilBERT_512_Supervisor_Brief.pdf`, full report `512_token_followup/DistilBERT_512_results.pdf`, every run in `distilbert_512_all_runs.csv`. The conclusion is unchanged.
